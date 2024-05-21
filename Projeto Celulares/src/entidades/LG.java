@@ -14,12 +14,12 @@ public class LG extends Nokia {
         super();
     }
 
-    public LG(String nome, String marca, String sistemaOperacional, String cor, String tipoBateria,
-            int capacidadeBateria, int memoriaRam, int armazenamento, String tipoTela, String chip, String internet,
+    public LG(String nome,double preco, String marca, String sistemaOperacional, String cor, String tipoBateria,
+            int capacidadeBateria, int memoriaRam, int armazenamento, String tipoTela, int numero, String internet,
             String camera, String flash, String bluetooth, String impressaoDigital,
             String infraVermelho, String memoriaExpansivel, String sensores) {
-        super(nome, marca, sistemaOperacional, cor, tipoBateria, capacidadeBateria, memoriaRam, armazenamento, tipoTela,
-                chip);
+        super(nome,preco, marca, sistemaOperacional, cor, tipoBateria, capacidadeBateria, memoriaRam, armazenamento, tipoTela,
+                numero);
         this.internet = internet;
         this.camera = camera;
         this.flash = flash;
@@ -93,4 +93,27 @@ public class LG extends Nokia {
     public void setSensores(String sensores) {
         this.sensores = sensores;
     }
+
+    public void conectarInternet() {
+        System.out.println("Buscando rede...");
+        System.out.println("Conectado!");
+    }
+
+    public void tirarFoto() {
+        System.out.println("Tirando uma foto...");
+        System.out.println("Foto!");
+    }
+
+    public void conectarBluetooth() {
+        System.out.println("Ligando bluetooth...");
+        System.out.println("Buscando uma conexão bluetooth...");
+        System.out.println("Conectado ao bluetooth...");
+        System.out.println("Conectado!");
+    }
+
+    public void ligarLanterna() {
+        System.out.println("Ligando a Lanterna...");
+        System.out.println("Lanterna ligada!");
+    }
+
 }

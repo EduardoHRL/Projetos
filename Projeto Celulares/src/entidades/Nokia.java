@@ -2,6 +2,7 @@ package entidades;
 
 public class Nokia {
     private String nome;
+    private double preco;
     private String marca;
     private String sistemaOperacional;
     private String cor;
@@ -10,15 +11,16 @@ public class Nokia {
     private int capacidadeBateria;
     private int memoriaRam;
     private int armazenamento;
-    private String chip;
+    private int numero;
 
     public Nokia() {
 
     }
 
-    public Nokia(String nome, String marca, String sistemaOperacional, String cor, String tipoBateria,
-            int capacidadeBateria, int memoriaRam, int armazenamento, String tipoTela, String chip) {
+    public Nokia(String nome,double preco, String marca, String sistemaOperacional, String cor, String tipoBateria,
+            int capacidadeBateria, int memoriaRam, int armazenamento, String tipoTela, int numero) {
         this.nome = nome;
+        this.preco = preco;
         this.marca = marca;
         this.sistemaOperacional = sistemaOperacional;
         this.cor = cor;
@@ -27,15 +29,15 @@ public class Nokia {
         this.memoriaRam = memoriaRam;
         this.armazenamento = armazenamento;
         this.tipoTela = tipoTela;
-        this.chip = chip;
+        this.numero = numero;
     }
 
-    public String getChip() {
-        return chip;
+    public int getNumero() {
+        return numero;
     }
 
-    public void setChip(String chip) {
-        this.chip = chip;
+    public void setNumero(int numero) {
+        this.numero = numero;
     }
 
     public String getNome() {
@@ -108,5 +110,20 @@ public class Nokia {
 
     public void setTela(String tipoTela) {
         this.tipoTela = tipoTela;
+    }
+
+    public double getPreco() {
+        return preco;
+    }
+
+    public void setPreco(double preco) {
+        this.preco = preco;
+    }
+
+    public void ligar() {
+        System.out.println("Ligando para "+numero+"...");
+    }
+    public void atender() {
+        System.out.println("Atendendo chamada de "+numero+"...");
     }
 }

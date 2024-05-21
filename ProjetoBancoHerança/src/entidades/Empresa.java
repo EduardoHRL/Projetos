@@ -19,5 +19,11 @@ public class Empresa extends Conta{
     public void setlimiteEmprestimo(double limite) {
         limiteEmprestimo = limite;
     }
+
+    public void emprestimo(double valor) {
+        if (valor <= limiteEmprestimo) {
+            saldo += valor - 10;
+        }
+    }
     
 }

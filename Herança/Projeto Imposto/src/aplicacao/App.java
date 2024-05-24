@@ -19,30 +19,41 @@ public class App {
         for (int i = 1; i <= n; i++) {
             sc.nextLine();
 
-            System.out.printf("\nContribuinte #1: ");
-            System.out.printf("Pessoa física ou jurídica? ");
-            String pessoa = sc.nextLine().toLowerCase().trim();
+            System.out.printf("\nContribuinte #%d: \n", i);
+            System.out.printf("Pessoa física ou jurídica? (f/j): ");
+            char ch = sc.next().charAt(0);
 
-            if (pessoa == "fisica") {
+            sc.nextLine();
+
+            if (ch == 'f') {
                 System.out.printf("Nome: ");
                 String nome = sc.nextLine();
                 System.out.printf("Renda anual: ");
                 double renda = sc.nextDouble();
                 System.out.printf("Gastos com saúde: ");
                 double gastos = sc.nextDouble();
-                lista.add(new Contribuinte(nome, renda, gastos));
+                lista.add(new Fisica(nome, renda, gastos));
 
-            } else if (pessoa == "juridica") {
+            } else if (ch == 'j') {
                 System.out.printf("Nome: ");
                 String nome = sc.nextLine();
                 System.out.printf("Renda anual: ");
                 double renda = sc.nextDouble();
                 System.out.printf("Quantidade de Funcionarios: ");
                 int func = sc.nextInt();
-                lista.add(new Contribuinte(nome, renda, func));
+                lista.add(new Juridico(nome, renda, func));
             }
-
         }
+        double total = 0;
+
+        System.out.println("\nTAXAS PAGAS");
+        for (Contribuinte x : lista) {
+            System.out.printf("\n%s: R$ %.2f", x.getNome(), x.Taxa());
+            total = total + x.Taxa();
+        }
+
+        System.out.printf("\n\nO total de taxas pagas foi R$ 3%.2f", total);
+        sc.close();
 
     }
 }

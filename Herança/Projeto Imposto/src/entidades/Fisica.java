@@ -18,10 +18,14 @@ public class Fisica extends Contribuinte{
     }
     
     @Override
-    public void Taxa() {
-        if (renda < 20000) {
-            
-        }
-    }
+    public double Taxa() {
+        if (renda < 20000.0) {
+			return renda * 0.15 - gastos * 0.5;
+		}
+		else {
+			return renda * 0.25 - gastos * 0.5;
+		}
+	}
+    
     
 }

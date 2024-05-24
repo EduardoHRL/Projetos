@@ -3,11 +3,11 @@ package entidades;
 public class Juridico extends Contribuinte{
     private int func;
 
-    private Juridico() {
+    public Juridico() {
         super();
     }
 
-    private Juridico(String nome, double renda, int func) {
+    public Juridico(String nome, double renda, int func) {
         super(nome, renda);
         this.func = func;
     }
@@ -19,6 +19,16 @@ public class Juridico extends Contribuinte{
     public void setFunc(int func) {
         this.func = func;
     }
+
+    @Override
+	public double Taxa() {
+		if (func > 10) {
+			return renda * 0.14;
+		}
+		else {
+			return renda * 0.16;
+		}
+	}
     
     
 }

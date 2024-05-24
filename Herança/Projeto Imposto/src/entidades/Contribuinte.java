@@ -29,5 +29,5 @@ public abstract class Contribuinte {
         this.renda = renda;
     }
 
-    public abstract void Taxa();
+    public abstract double Taxa();
 }

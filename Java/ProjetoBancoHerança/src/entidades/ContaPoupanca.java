@@ -27,7 +27,6 @@ public class ContaPoupanca extends Conta{
 
     @Override
     public void sacar(double valor) {
-        super.sacar(valor);
-        saldo -= 2.0;
+        saldo -= valor;
     }
 }

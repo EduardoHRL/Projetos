@@ -1,5 +1,7 @@
 package entidades;
 
+import java.util.Scanner;
+
 public class Dvd extends Midia {
     private int nFaixas;
 
@@ -29,5 +31,19 @@ public class Dvd extends Midia {
     public String detalhes() {
         return super.detalhes() 
         +"\nNúmero de faixas: " +nFaixas;
+    }
+
+    @Override
+    public void insereDados() {
+
+        super.insereDados();
+        Scanner sc = new Scanner(System.in);
+
+        System.out.printf("Entre com o número de faixas: ");
+        int nFaixas = sc.nextInt();
+
+        this.nFaixas = nFaixas;
+
+        
     }
 }

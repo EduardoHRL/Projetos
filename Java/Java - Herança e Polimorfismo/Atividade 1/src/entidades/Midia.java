@@ -61,15 +61,16 @@ public abstract class Midia {
 
         System.out.printf("\n Entre com o codigo: ");
         int codigo = sc.nextInt();
-        System.out.printf("\n Entre com o preco: ");
-        double preco = sc.nextDouble();
-        sc.nextLine(); // Leitura do enter.
+        sc.nextLine();
         System.out.printf("\n Entre com o nome: ");
         String nome = sc.nextLine();
+        System.out.printf("\n Entre com o preco: ");
+        double preco = sc.nextDouble();
+ 
         this.nome = nome;
         this.preco = preco;
         this.codigo = codigo;
 
-        sc.close();
+
     }
 }

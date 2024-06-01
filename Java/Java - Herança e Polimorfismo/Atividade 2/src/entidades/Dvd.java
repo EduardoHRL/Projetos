@@ -9,7 +9,7 @@ public class Dvd extends Midia {
         super();
     }
 
-    public Dvd(int codigo, String nome, double preco, int nFaixas) {
+    public Dvd(int codigo, double preco, String nome, int nFaixas) {
         super(codigo, nome, preco);
         this.nFaixas = nFaixas;
     }
@@ -18,8 +18,8 @@ public class Dvd extends Midia {
         return nFaixas;
     }
 
-    public void setnFaixas(int nFaixas) {
-        this.nFaixas = nFaixas;
+    public void setFaixas(int nfaix) {
+        nFaixas = (nfaix > 0) ? nfaix : 0;
     }
 
     @Override
@@ -29,8 +29,8 @@ public class Dvd extends Midia {
 
     @Override
     public String detalhes() {
-        return super.detalhes() 
-        +"\nNúmero de faixas: " +nFaixas;
+        return super.detalhes()
+                + "\nNúmero de faixas: " + nFaixas;
     }
 
     @Override
@@ -44,6 +44,5 @@ public class Dvd extends Midia {
 
         this.nFaixas = nFaixas;
 
-        
     }
 }

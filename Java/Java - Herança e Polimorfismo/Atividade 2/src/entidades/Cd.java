@@ -8,7 +8,7 @@ public class Cd extends Midia{
         super();
     }
 
-    public Cd(int codigo, String nome, double preco, int nMusicas) {
+    public Cd(int codigo, double preco, String nome, int nMusicas) {
         super(codigo, nome, preco);
         this.nMusicas = nMusicas;
     }

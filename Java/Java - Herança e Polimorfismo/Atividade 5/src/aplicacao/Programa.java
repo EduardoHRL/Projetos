@@ -24,7 +24,7 @@ public class Programa {
         System.out.println("\nInformações do Veiculo: \n");
         veiculo.printDados();
 
-
+        sc.close();
 
     }
 }

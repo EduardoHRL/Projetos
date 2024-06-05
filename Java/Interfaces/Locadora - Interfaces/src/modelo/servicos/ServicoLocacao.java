@@ -32,7 +32,7 @@ public class ServicoLocacao {
 
         double taxa = taxaServico.taxa(pagamentoBasico);
 
-        locacao.setFatura(new Fatura(pagamentoBasico, taxa));
+        locacao.setFatura(new Fatura('' '', taxa));
     }
     
 }

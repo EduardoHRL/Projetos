@@ -1,13 +1,17 @@
 package entidades;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Contrato {
     private Integer numero;
-    private LocalDateTime Data;
+    private LocalDate Data;
     private double valorTotal;
+
+    private List<Prestacao> prestacao = new ArrayList<>();
     
-    public Contrato(Integer numero, LocalDateTime Data, double valorTotal) {
+    public Contrato(Integer numero, LocalDate Data, double valorTotal) {
         this.numero = numero;
         this.Data = Data;
         this.valorTotal = valorTotal;
@@ -21,11 +25,11 @@ public class Contrato {
         this.numero = numero;
     }
 
-    public LocalDateTime getData() {
+    public LocalDate getData() {
         return Data;
     }
 
-    public void setData(LocalDateTime data) {
+    public void setData(LocalDate data) {
         Data = data;
     }
 
@@ -35,6 +39,10 @@ public class Contrato {
 
     public void setValorTotal(double valorTotal) {
         this.valorTotal = valorTotal;
+    }
+
+    public List<Prestacao> getPrestacao() {
+        return prestacao;
     }
     
 }

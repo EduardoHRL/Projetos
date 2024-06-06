@@ -21,7 +21,8 @@ public class Programa {
 
         ServicoJuros pagamento = new ServicoJuros();
 
-        System.out.printf("Pagamentos após %d meses é de %.2f",meses,pagamento.pagamentoBr(valor, meses));
+        System.out.printf("Pagamentos após %d meses no Brasil é de %.2f",meses,pagamento.pagamentoBr(valor, meses));
+        System.out.printf("\nPagamentos após %d meses nos Estados Unidos é de %.2f", meses, pagamento.pagamentoEua(valor, meses));
     }
 
 }

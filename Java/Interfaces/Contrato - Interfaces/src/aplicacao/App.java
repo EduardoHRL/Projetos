@@ -8,8 +8,6 @@ import entidades.Prestacao;
 import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.ArrayList;
 
 public class App {
     public static void main(String[] args) throws Exception {
@@ -43,10 +41,10 @@ public class App {
         System.out.println("Parcelas:");
         for (Prestacao prestacao : contrato.getPrestacao()) {
             System.out.println(prestacao);
-            
+            prestacao.getValorTotal();
         }
-
-
+        System.out.printf("O total do valor do contrato é: %.2f",serc.getValorTotal());
+        System.out.println("\nO número do contrato é: "+numero);
 
         sc.close();
 

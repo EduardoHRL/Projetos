@@ -25,6 +25,9 @@ public class ServicoContrato {
             contrato.getPrestacao().add(new Prestacao(dataParcela, quota, valorTotal));
             valorTotal += quota;
         }
-
-}
+        this.valorTotal = valorTotal;
+    }
+    public double getValorTotal() {
+        return valorTotal;
+    }
 }

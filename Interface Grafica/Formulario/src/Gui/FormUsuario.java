@@ -8,6 +8,7 @@ package Gui;
 import javax.swing.JOptionPane;
 import Modelo.Usuario;
 import DAO.UsuarioDao;
+import java.awt.event.WindowAdapter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -285,6 +286,8 @@ public class FormUsuario extends javax.swing.JFrame {
         modelo.addRow(dados);
     }
 
+    
+    
     public void PopularJTable(String sql) {
         try {
             Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/db", "root", "");
@@ -310,6 +313,7 @@ public class FormUsuario extends javax.swing.JFrame {
             System.out.println("o erro foi " + ex);
         }
     }
+
     
 
     public static void main(String args[]) {

@@ -37,35 +37,7 @@ public class UsuarioDao {
     }
 
     public void consulta(Usuario usuario) throws SQLException {
-        String query = "SELECY * FROM tbl_usuario";
-
-        try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-
-            while (resultSet.next()) {
-                int id = resultSet.getInt("id");
-                String nome = resultSet.getString("nome");
-                int cpf = resultSet.getInt("cpf");
-                String email = resultSet.getString("email");
-                String telefone = resultSet.getString("telefone");
-
-                FormUsuario tabela = new FormUsuario();
-
-                Object[] rowData = {nome, cpf, email, telefone};
-                tabela.Tabela(rowData);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            // Fechar a conexão com o banco de dados
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-        }
+        
+        
     }
 }

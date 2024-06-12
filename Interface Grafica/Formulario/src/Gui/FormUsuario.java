@@ -8,12 +8,11 @@ package Gui;
 import javax.swing.JOptionPane;
 import Modelo.Usuario;
 import DAO.UsuarioDao;
-import java.awt.event.WindowAdapter;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -38,7 +37,6 @@ public class FormUsuario extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        entityManager = java.beans.Beans.isDesignTime() ? null : javax.persistence.Persistence.createEntityManagerFactory("mysql?zeroDateTimeBehavior=convertToNullPU").createEntityManager();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
@@ -60,7 +58,7 @@ public class FormUsuario extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
-                formWindowOpened(evt);
+                Tabela(evt);
             }
         });
 
@@ -276,47 +274,20 @@ public class FormUsuario extends javax.swing.JFrame {
         // TODO add your handing code here:
     }//GEN-LAST:event_jButton4ActionPerformed
 
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        // TODO add your handling code here:
-    }//GEN-LAST:event_formWindowOpened
+    private void Tabela(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_Tabela
+        List<Usuario> usuarios = UsuarioDao.consultarTodos();
+        DefaultTableModel model = (DefaultTableModel) Tabela.getModel();
 
-    public void Tabela(java.awt.event.ActionEvent evt) {
-        DefaultTableModel modelo = (DefaultTableModel) Tabela.getModel();
-        Object[] dados = {nome.getText(), cpf.getText(), email.getText(), telefone.getText()};
-        modelo.addRow(dados);
-    }
-
-    
-    
-    public void PopularJTable(String sql) {
-        try {
-            Connection con = (Connection) DriverManager.getConnection("jdbc:mysql://localhost:3306/db", "root", "");
- 
-            PreparedStatement banco = (PreparedStatement) con.prepareStatement(sql);
-            banco.execute(); // cria o vetor
-            ResultSet resultado = banco.executeQuery(sql);
-            DefaultTableModel model = (DefaultTableModel) Tabela.getModel();
-            model.setNumRows(0);
-            while (resultado.next()) {
-                model.addRow(new Object[]{
-                    //retorna os dados da tabela do BD, cada campo e um coluna.
-                    resultado.getString("ID"),
-                    resultado.getString("NOME"),
-                    resultado.getString("cpf"),
-                    resultado.getString("email"),
-                    resultado.getString("telefone")
-                });
-            }
-            banco.close();
-            con.close();
-        } catch (SQLException ex) {
-            System.out.println("o erro foi " + ex);
+        for (Usuario usuario : consultarTodos) {
+            Object[] rowData = {usuario.getNome()};
+            model.addRow(rowData);
         }
-    }
 
-    
+        Tabela.updateUI();
+    }//GEN-LAST:event_Tabela
 
     public static void main(String args[]) {
+
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -348,11 +319,11 @@ public class FormUsuario extends javax.swing.JFrame {
         });
     }
 
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTable Tabela;
     private javax.swing.JTextField cpf;
     private javax.swing.JTextField email;
-    private javax.persistence.EntityManager entityManager;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -369,7 +340,15 @@ public class FormUsuario extends javax.swing.JFrame {
     private javax.swing.JTextField telefone;
     // End of variables declaration//GEN-END:variables
 
-    public void Tabela(Object[] rowData) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void Tabela(List<Usuario> consultarTodos) {
+        DefaultTableModel model = (DefaultTableModel) Tabela.getModel();
+
+        for (Usuario usuario : consultarTodos) {
+            Object[] rowData = {usuario.getNome()};
+            model.addRow(rowData);
+        }
+
+        Tabela.updateUI();
     }
+    
 }

@@ -5,6 +5,9 @@ import Modelo.Usuario;
 import java.sql.*;
 import java.sql.PreparedStatement;
 import Gui.FormUsuario;
+import java.util.List;
+import java.util.ArrayList;
+import javax.swing.table.DefaultTableModel;
 
 public class UsuarioDao {
 
@@ -36,8 +39,36 @@ public class UsuarioDao {
         }
     }
 
-    public void consulta(Usuario usuario) throws SQLException {
-        
-        
+    public List<Usuario> consultarTodos() {
+        String sql = "SELECT * FROM tbl_usuario";
+        List<Usuario> usuarios = new ArrayList<>();
+
+        try {
+
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            ResultSet resultado = stmt.executeQuery();
+            while (resultado.next()) {
+                Usuario usuario = new Usuario();
+                usuario.setId(resultado.getLong("id"));
+                usuario.setNome(resultado.getString("nome"));
+                usuario.setCpf(resultado.getString("cpf"));
+                usuario.setEmail(resultado.getString("email"));
+                usuario.setTelefone(resultado.getString("telefone"));
+                usuarios.add(usuario);
+            }
+            resultado.close();
+            stmt.close();
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        }
+        return usuarios;
     }
+    public static List<usuario> getUsuario() {
+        return usuarios
+    }
+            
+    
+    
+    
+    
 }

@@ -33,4 +33,4 @@ cidade3 = Cidade("Itumbiara",125765)
 minas = Estado({cidade, cidade2},"Minas Gerais", "MG")
 goias = Estado({cidade3},"Goias","GO")
 
-minas.resumo()
+minas.resumo() 

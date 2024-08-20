@@ -1,4 +1,4 @@
-from banco_dados import banco
+from tkinter.bancoDados import banco
 
 class usuarios(object):
     

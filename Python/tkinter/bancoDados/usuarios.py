@@ -1,4 +1,4 @@
-from tkinter.bancoDados import banco
+from banco import banco
 
 class usuarios(object):
     
@@ -17,13 +17,10 @@ class usuarios(object):
         try:
             c = b.conexao.cursor()
 
-            c.execute("""insert into usuarios(nome, telefone, email, usuario, senha)
-                      values
-            ("' +self.nome+"',"'+
-            self.telefone+ "', '"+ self.email + "','"+
-            self.usuario + "','" + self.senha+ "')""")
-
-            banco.conexao.commit()
+            c.execute("insert into usuarios(nome, telefone, email, usuario, senha) values ('"+self.nome+"','"+self.telefone+"','"+self.email+"','"+self.usuario+"','"+self.senha+"')")
+            
+            b.conexao.commit()
+            c.close()
             return "Usuario cadastrado com sucesso!"
         except:
             return "Ocorreu um erro!"
@@ -68,7 +65,7 @@ class usuarios(object):
         try:
             c = b.conexao.cursor()
 
-            c.execute("""select * from usuarios where id = "+ self.id+" """)
+            c.execute("select * from usuarios where id = "+ self.id+" ")
 
             for linha in c:
                 self.id = linha[0]

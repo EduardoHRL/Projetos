@@ -1,6 +1,6 @@
 from tkinter import *
 
-from tkinter.bancoDados import bancoDados
+from usuarios import *
 
 class aplicativo:
     def __init__(self, master = None):
@@ -38,7 +38,9 @@ class aplicativo:
         self.entID = Entry(self.container)
         self.entID["width"] = 5
         self.entID.pack(side = LEFT)
+
         self.botaoID = Button(self.container,text = "Buscar")
+        self.botaoID["command"] = self.buscarUsuario
         self.botaoID.pack(padx = 5)
         
 
@@ -73,30 +75,107 @@ class aplicativo:
         self.entSenha.pack()
 
         self.botInsert = Button(self.setimoContainer,text="Inserir", width = 12)
+        self.botInsert["command"] = self.inserirUsuario
         self.botInsert.pack(side = LEFT)
 
         self.botAlterar = Button(self.setimoContainer, text = "Alterar", width = 12)
+        self.botAlterar["command"] = self.alterarUsuario
         self.botAlterar.pack(side = LEFT)
 
         self.botExcluir = Button(self.setimoContainer,text = "Excluir", width = 12)
+        self.botExcluir["command"] = self.excluirUsuario
         self.botExcluir.pack(side = LEFT)
 
         self.botLimpar = Button(self.setimoContainer, text = "Limpar", width = 12)
         self.botLimpar["command"] = self.Limpar
         self.botLimpar.pack(side = LEFT)
 
+        self.msg = Label(text = "")
+        self.msg.pack()
+
     def Limpar(self):
         self.entID.delete(0, END)
-        self.entNome["text"]  = ""
-        self.entTelefone["text"]  = ""
-        self.entEmail["text"]  = ""
-        self.entUsuario["text"]  = ""
-        self.entSenha["text"]  = ""
+        self.entNome.delete(0, END)
+        self.entTelefone.delete(0, END)
+        self.entEmail.delete(0, END)
+        self.entUsuario.delete(0, END)
+        self.entSenha.delete(0, END)
 
     def inserirUsuario(self):
         user = usuarios()
 
+        user.nome = self.entNome.get()
+        user.telefone = self.entTelefone.get()
+        user.email = self.entEmail.get()
+        user.usuario = self.entUsuario.get()
+        user.senha = self.entSenha.get()
 
+        self.entID.delete(0, END)
+        self.entNome.delete(0, END)
+        self.entTelefone.delete(0, END)
+        self.entEmail.delete(0, END)
+        self.entUsuario.delete(0, END)
+        self.entSenha.delete(0, END)
+
+        self.msg["text"] = user.insertUser()
+
+    def alterarUsuario(self):
+        user = usuarios()
+
+        user.id = self.entID.get()
+        user.nome = self.entNome.get()
+        user.telefone = self.entTelefone.get()
+        user.email = self.entEmail.get()
+        user.usuario = self.entUsuario.get()
+        user.senha = self.entSenha.get()
+
+        self.entID.delete(0, END)
+        self.entNome.delete(0, END)
+        self.entTelefone.delete(0, END)
+        self.entEmail.delete(0, END)
+        self.entUsuario.delete(0, END)
+        self.entSenha.delete(0, END)
+
+        self.msg["text"] = user.updateUser()
+
+    def excluirUsuario(self):
+        user = usuarios()
+
+        user.id = self.entID.get()
+
+        self.entID.delete(0, END)
+        self.entNome.delete(0, END)
+        self.entTelefone.delete(0, END)
+        self.entEmail.delete(0, END)
+        self.entUsuario.delete(0, END)
+        self.entSenha.delete(0, END)
+
+    def buscarUsuario(self):
+        user = usuarios()
+
+        user.id = self.entID.get()
+        
+ 
+
+        self.entID.delete(0, END)
+        self.entID.insert(INSERT, user.id)
+
+        self.entNome.delete(0, END)
+        self.entNome.insert(INSERT, user.nome)
+
+        self.entTelefone.delete(0, END)
+        self.entTelefone.insert(INSERT,user.telefone)
+
+        self.entEmail.delete(0, END)
+        self.entEmail.insert(INSERT, user.email)
+
+        self.entUsuario.delete(0, END)
+        self.entUsuario.insert(INSERT, user.usuario)
+
+        self.entSenha.delete(0, END)
+        self.entSenha.insert(INSERT,user.senha)
+
+        self.msg["text"] = user.selectUser()
 
 root = Tk()
 aplicativo(root)

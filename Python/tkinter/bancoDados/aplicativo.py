@@ -122,6 +122,8 @@ class aplicativo:
     def alterarUsuario(self):
         user = usuarios()
 
+        self.msg["text"] = user.updateUser()
+
         user.id = self.entID.get()
         user.nome = self.entNome.get()
         user.telefone = self.entTelefone.get()
@@ -143,6 +145,8 @@ class aplicativo:
 
         user.id = self.entID.get()
 
+        self.msg["text"] = user.deleteUser()
+
         self.entID.delete(0, END)
         self.entNome.delete(0, END)
         self.entTelefone.delete(0, END)
@@ -154,8 +158,8 @@ class aplicativo:
         user = usuarios()
 
         user.id = self.entID.get()
-        
- 
+
+        self.msg["text"] = user.selectUser()
 
         self.entID.delete(0, END)
         self.entID.insert(INSERT, user.id)
@@ -175,8 +179,8 @@ class aplicativo:
         self.entSenha.delete(0, END)
         self.entSenha.insert(INSERT,user.senha)
 
-        self.msg["text"] = user.selectUser()
-
-root = Tk()
-aplicativo(root)
-root.mainloop()
+        
+if __name__ == "__main__":
+    root = Tk()
+    aplicativo(root)
+    root.mainloop()

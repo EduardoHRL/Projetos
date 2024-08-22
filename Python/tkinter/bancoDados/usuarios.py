@@ -30,10 +30,8 @@ class usuarios(object):
         try:
             c = b.conexao.cursor()
 
-            c.execute("""update usuarios set nome = '" + self.nome+ "',
-            telefone = '"+self.telefone+"', email = '"+self.email+"', 
-            usuario = '"+self.usuario+"', senha = '"+self.senha+"' 
-            where id = " + self.id +""""")
+            c.execute("update usuarios set nome = '" + self.nome+ "', telefone = '"+self.telefone+"', email = '"+self.email+"', usuario = '"+self.usuario+"', senha = '"+self.senha+"' where id = "+self.id+" ")
+
 
             b.conexao.commit()
             c.close()
@@ -49,7 +47,7 @@ class usuarios(object):
 
             c = b.conexao.cursor()
 
-            c.execute("""delete from usuarios where id = "+ self.id+" """)
+            c.execute("delete from usuarios where id = " +self.id+ " ")
 
             b.conexao.commit()
             
@@ -65,7 +63,7 @@ class usuarios(object):
         try:
             c = b.conexao.cursor()
 
-            c.execute("select * from usuarios where id = "+ self.id+" ")
+            c.execute("select * from usuarios where id = " + self.id + " ")
 
             for linha in c:
                 self.id = linha[0]

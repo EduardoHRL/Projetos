@@ -14,7 +14,17 @@ class banco():
                   telefone text,
                   email text,
                   usuario text,
-                  senha text)""")
+                  senha text
+                  
+                  create table if not exists cidades(
+                  nome text primary key,
+                  estado text
+                  
+                  )""")
+        
+      
         self.conexao.commit()
         c.close()
+    
+    
                 

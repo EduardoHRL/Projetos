@@ -1,1 +1,0 @@
-from aplicativo import aplicativo

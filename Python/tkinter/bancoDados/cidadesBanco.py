@@ -1,4 +1,4 @@
-from banco import banco
+from tkinter.bancoDados.banco import banco
 
 class cid(object):
 

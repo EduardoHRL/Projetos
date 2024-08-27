@@ -1,81 +1,226 @@
-from banco import banco
+from tkinter import *
+from tkinter import ttk
 
-class usuarios(object):
-    
-    def __init__(self, id = 0, nome ="", telefone = "", email = "", usuario="", senha=""):
-        self.info = {}
-        self.id = id
-        self.nome = nome
-        self.telefone = telefone
-        self.email = email
-        self.usuario = usuario
-        self.senha = senha
+from insertUsuarios import *
 
-    def insertUser(self):
-        b = banco()
-
-        try:
-            c = b.conexao.cursor()
-
-            c.execute("insert into usuarios(nome, telefone, email, usuario, senha) values ('"+self.nome+"','"+self.telefone+"','"+self.email+"','"+self.usuario+"','"+self.senha+"')")
-            
-            b.conexao.commit()
-            c.close()
-            return "Usuario cadastrado com sucesso!"
-        except:
-            return "Ocorreu um erro!"
+class aplicativo:
+    def __init__(self, master = None):
+        self.fontePadrao = ("Arial", "10")
         
-    def updateUser(self):
-        b = banco()
-        try:
-            c = b.conexao.cursor()
+        self.primeiroContainer = Frame(master)
+        self.primeiroContainer.pack(pady = 20)
 
-            c.execute("update usuarios set nome = '" + self.nome+ "', telefone = '"+self.telefone+"', email = '"+self.email+"', usuario = '"+self.usuario+"', senha = '"+self.senha+"' where id = "+self.id+" ")
+        self.container = Frame(master)
+        self.container.pack(pady = 5, padx = 20)
 
+        self.segundoContainer = Frame(master)
+        self.segundoContainer.pack(pady = 5, padx = 20)
 
-            b.conexao.commit()
-            c.close()
+        self.terceiroContainer = Frame(master)
+        self.terceiroContainer.pack(pady = 5, padx = 20)
 
-            return "Usuario atualizado com sucesso!"
-        except:
-            return "Ocorreu um erro na alteração do usuario!"
-            
+        self.quartoContainer = Frame(master)
+        self.quartoContainer.pack(pady = 5, padx = 20)
 
-    def deleteUser(self):
-        b = banco()
-        try:
+        self.quintoContainer = Frame(master)
+        self.quintoContainer.pack(pady = 5, padx = 20)
 
-            c = b.conexao.cursor()
+        self.sextoContainer = Frame(master)
+        self.sextoContainer.pack(pady = 5, padx = 20)
 
-            c.execute("delete from usuarios where id = " +self.id+ " ")
+        self.setimoContainer = Frame(master)
+        self.setimoContainer.pack(pady = 10, padx = 20)
 
-            b.conexao.commit()
-            
-            c.close()
+        self.cad = Label(self.primeiroContainer, text = "Cadastro de Usuarios")
+        self.cad.pack()
 
-            return "Usuario excluido com sucesso"
-        except:
-            return "Ocorreu um erro na exclusão do usuario"
+        self.buscarID = Label(self.container, text = "Buscar ID:", font = self.fontePadrao)
+        self.buscarID.pack(side = LEFT)
+        self.entID = Entry(self.container)
+        self.entID["width"] = 5
+        self.entID.pack(side = LEFT)
+
+        self.botaoID = Button(self.container,text = "Buscar")
+        self.botaoID["command"] = self.buscarUsuario
+        self.botaoID.pack(padx = 5)
         
-    def selectUser(self):
-        b = banco()
 
-        try:
-            c = b.conexao.cursor()
+        self.txtNome = Label(self.segundoContainer,text = "Nome: ", font = self.fontePadrao, width = 10)
+        self.txtNome.pack(side = LEFT)
+        self.entNome = Entry(self.segundoContainer)
+        self.entNome["width"] = 25
+        self.entNome.pack(side = LEFT)
 
-            c.execute("select * from usuarios where id = " + self.id + " ")
+        self.txtTelefone = Label(self.terceiroContainer,text = "Telefone:", font = self.fontePadrao, width = 10)
+        self.txtTelefone.pack(side = LEFT)
+        self.entTelefone = Entry(self.terceiroContainer)
+        self.entTelefone["width"] = 25
+        self.entTelefone.pack()
 
-            for linha in c:
-                self.id = linha[0]
-                self.nome = linha[1]
-                self.telefone = linha[2]
-                self.email = linha[3]
-                self.usuario = linha[4]
-                self.senha = linha[5]
+        self.txtEmail = Label(self.quartoContainer,text = "Email:", font = self.fontePadrao, width = 10)
+        self.txtEmail.pack(side=LEFT)
+        self.entEmail = Entry(self.quartoContainer)
+        self.entEmail["width"] = 25
+        self.entEmail.pack()
 
-            c.close()
+        self.txtUsuario = Label(self.quintoContainer, text = "Usuario: ", font = self.fontePadrao, width = 10)
+        self.txtUsuario.pack(side = LEFT)
+        self.entUsuario = Entry(self.quintoContainer)
+        self.entUsuario["width"] = 25
+        self.entUsuario.pack()
 
-            return "Busca feita com sucesso"
-        except:
-            return "Ocorreu um erro na busca"
+        self.txtSenha = Label(self.sextoContainer, text = "Senha: ", font = self.fontePadrao, width = 10)
+        self.txtSenha.pack(side = LEFT)
+        self.entSenha = Entry(self.sextoContainer)
+        self.entSenha["width"] = 25
+        self.entSenha.pack()
 
+        self.botInsert = Button(self.setimoContainer,text="Inserir", width = 12)
+        self.botInsert["command"] = self.inserirUsuario
+        self.botInsert.pack(side = LEFT)
+
+        self.botAlterar = Button(self.setimoContainer, text = "Alterar", width = 12)
+        self.botAlterar["command"] = self.alterarUsuario
+        self.botAlterar.pack(side = LEFT)
+
+        self.botExcluir = Button(self.setimoContainer,text = "Excluir", width = 12)
+        self.botExcluir["command"] = self.excluirUsuario
+        self.botExcluir.pack(side = LEFT)
+
+        self.botLimpar = Button(self.setimoContainer, text = "Limpar", width = 12)
+        self.botLimpar["command"] = self.Limpar
+        self.botLimpar.pack(side = LEFT)
+
+        self.msg = Label(text = "")
+        self.msg.pack()
+
+        self.tree = self.createTreeView(master)
+
+    def Limpar(self):
+        self.entID.delete(0, END)
+        self.entNome.delete(0, END)
+        self.entTelefone.delete(0, END)
+        self.entEmail.delete(0, END)
+        self.entUsuario.delete(0, END)
+        self.entSenha.delete(0, END)
+
+    def inserirUsuario(self):
+        user = usuarios()
+
+        user.nome = self.entNome.get()
+        user.telefone = self.entTelefone.get()
+        user.email = self.entEmail.get()
+        user.usuario = self.entUsuario.get()
+        user.senha = self.entSenha.get()
+
+        self.entID.delete(0, END)
+        self.entNome.delete(0, END)
+        self.entTelefone.delete(0, END)
+        self.entEmail.delete(0, END)
+        self.entUsuario.delete(0, END)
+        self.entSenha.delete(0, END)
+
+        self.msg["text"] = user.insertUser()
+        self.atualizarTreeView()
+
+    def alterarUsuario(self):
+        user = usuarios()
+
+        self.msg["text"] = user.updateUser()
+
+        user.id = self.entID.get()
+        user.nome = self.entNome.get()
+        user.telefone = self.entTelefone.get()
+        user.email = self.entEmail.get()
+        user.usuario = self.entUsuario.get()
+        user.senha = self.entSenha.get()
+
+        self.entID.delete(0, END)
+        self.entNome.delete(0, END)
+        self.entTelefone.delete(0, END)
+        self.entEmail.delete(0, END)
+        self.entUsuario.delete(0, END)
+        self.entSenha.delete(0, END)
+
+        self.msg["text"] = user.updateUser()
+        self.atualizarTreeView()
+
+    def excluirUsuario(self):
+        user = usuarios()
+
+        user.id = self.entID.get()
+
+        self.msg["text"] = user.deleteUser()
+
+        self.entID.delete(0, END)
+        self.entNome.delete(0, END)
+        self.entTelefone.delete(0, END)
+        self.entEmail.delete(0, END)
+        self.entUsuario.delete(0, END)
+        self.entSenha.delete(0, END)
+        
+        self.atualizarTreeView()
+
+    def buscarUsuario(self):
+        user = usuarios()
+
+        user.id = self.entID.get()
+
+        self.msg["text"] = user.selectUser()
+
+        self.entID.delete(0, END)
+        self.entID.insert(INSERT, user.id)
+
+        self.entNome.delete(0, END)
+        self.entNome.insert(INSERT, user.nome)
+
+        self.entTelefone.delete(0, END)
+        self.entTelefone.insert(INSERT,user.telefone)
+
+        self.entEmail.delete(0, END)
+        self.entEmail.insert(INSERT, user.email)
+
+        self.entUsuario.delete(0, END)
+        self.entUsuario.insert(INSERT, user.usuario)
+
+        self.entSenha.delete(0, END)
+        self.entSenha.insert(INSERT,user.senha)
+
+
+    def createTreeView(self, root):
+        
+        user = usuarios()
+
+        self.tree = ttk.Treeview(root, columns=("ID", "Nome", "Telefone", "Email", "Usuario", "Senha"), show = "headings")
+        self.tree.heading("ID", text = "ID")
+        self.tree.heading("Nome", text = "Nome")
+        self.tree.heading("Telefone", text = "Telefone")
+        self.tree.heading("Email", text = "Email")
+        self.tree.heading("Usuario", text = "Usuario")
+        self.tree.heading("Senha", text = "Senha")
+        self.tree.pack(fill = BOTH, expand = True)
+
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+        rows = user.buscarTreeView()
+
+        for row in rows:
+            self.tree.insert("", END, values=row)
+        
+        return self.tree
+    def atualizarTreeView(self):
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+
+        user = usuarios()
+        rows = user.buscarTreeView()
+
+        for row in rows:
+            self.tree.insert("", END, values=row)
+
+        
+if __name__ == "__main__":
+    root = Tk()
+    app = aplicativo(root)
+
+    root.mainloop()

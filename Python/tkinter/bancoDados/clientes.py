@@ -1,6 +1,7 @@
 from tkinter import *
+from tkinter import ttk
 
-from usuarios import *
+from insertUsuarios import *
 
 class aplicativo:
     def __init__(self, master = None):
@@ -28,9 +29,10 @@ class aplicativo:
         self.sextoContainer.pack(pady = 5, padx = 20)
 
         self.setimoContainer = Frame(master)
-        self.setimoContainer.pack(pady = 10, padx = 20)
+        self.setimoContainer.pack(pady = 5, padx = 20)
 
-        self.cad = Label(self.primeiroContainer, text = "Cadastro de Usuarios")
+
+        self.cad = Label(self.primeiroContainer, text = "Cadastro de Clientes")
         self.cad.pack()
 
         self.buscarID = Label(self.container, text = "Buscar ID:", font = self.fontePadrao)
@@ -62,17 +64,18 @@ class aplicativo:
         self.entEmail["width"] = 25
         self.entEmail.pack()
 
-        self.txtUsuario = Label(self.quintoContainer, text = "Usuario: ", font = self.fontePadrao, width = 10)
-        self.txtUsuario.pack(side = LEFT)
-        self.entUsuario = Entry(self.quintoContainer)
-        self.entUsuario["width"] = 25
-        self.entUsuario.pack()
+        self.txtEndereco = Label(self.quintoContainer, text = "Endereço:", font = self.fontePadrao, width = 10)
+        self.txtEndereco.pack(side = LEFT)
+        self.entEndereco = Entry(self.quintoContainer)
+        self.entEndereco["width"] =25
+        self.entEndereco.pack()
 
-        self.txtSenha = Label(self.sextoContainer, text = "Senha: ", font = self.fontePadrao, width = 10)
-        self.txtSenha.pack(side = LEFT)
-        self.entSenha = Entry(self.sextoContainer)
-        self.entSenha["width"] = 25
-        self.entSenha.pack()
+        self.txtCpf = Label(self.sextoContainer, text = "Cpf:", font = self.fontePadrao, width = 10)
+        self.txtCpf.pack(side = LEFT)
+        self.entCpf = Entry(self.sextoContainer)
+        self.entCpf["width"] =25
+        self.entCpf.pack()
+
 
         self.botInsert = Button(self.setimoContainer,text="Inserir", width = 12)
         self.botInsert["command"] = self.inserirUsuario
@@ -93,6 +96,8 @@ class aplicativo:
         self.msg = Label(text = "")
         self.msg.pack()
 
+        self.tree = self.createTreeView(master)
+
     def Limpar(self):
         self.entID.delete(0, END)
         self.entNome.delete(0, END)
@@ -101,7 +106,7 @@ class aplicativo:
         self.entUsuario.delete(0, END)
         self.entSenha.delete(0, END)
 
-    def inserirUsuario(self):
+    def inserirCliente(self):
         user = usuarios()
 
         user.nome = self.entNome.get()
@@ -118,6 +123,7 @@ class aplicativo:
         self.entSenha.delete(0, END)
 
         self.msg["text"] = user.insertUser()
+        self.atualizarTreeView()
 
     def alterarUsuario(self):
         user = usuarios()
@@ -139,6 +145,7 @@ class aplicativo:
         self.entSenha.delete(0, END)
 
         self.msg["text"] = user.updateUser()
+        self.atualizarTreeView()
 
     def excluirUsuario(self):
         user = usuarios()
@@ -153,6 +160,8 @@ class aplicativo:
         self.entEmail.delete(0, END)
         self.entUsuario.delete(0, END)
         self.entSenha.delete(0, END)
+        
+        self.atualizarTreeView()
 
     def buscarUsuario(self):
         user = usuarios()
@@ -179,8 +188,41 @@ class aplicativo:
         self.entSenha.delete(0, END)
         self.entSenha.insert(INSERT,user.senha)
 
+
+    def createTreeView(self, root):
+        
+        user = usuarios()
+
+        self.tree = ttk.Treeview(root, columns=("ID", "Nome", "Telefone", "Email", "Usuario", "Senha"), show = "headings")
+        self.tree.heading("ID", text = "ID")
+        self.tree.heading("Nome", text = "Nome")
+        self.tree.heading("Telefone", text = "Telefone")
+        self.tree.heading("Email", text = "Email")
+        self.tree.heading("Usuario", text = "Usuario")
+        self.tree.heading("Senha", text = "Senha")
+        self.tree.pack(fill = BOTH, expand = True)
+
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+        rows = user.buscarTreeView()
+
+        for row in rows:
+            self.tree.insert("", END, values=row)
+        
+        return self.tree
+    def atualizarTreeView(self):
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+
+        user = usuarios()
+        rows = user.buscarTreeView()
+
+        for row in rows:
+            self.tree.insert("", END, values=row)
+
         
 if __name__ == "__main__":
     root = Tk()
-    aplicativo(root)
+    app = aplicativo(root)
+
     root.mainloop()

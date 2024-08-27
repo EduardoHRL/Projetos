@@ -125,7 +125,7 @@ class aplicativo:
         self.msg["text"] = user.insertUser()
         self.atualizarTreeView()
 
-    def alterarUsuario(self):
+    def alterarCliente(self):
         user = usuarios()
 
         self.msg["text"] = user.updateUser()
@@ -134,15 +134,11 @@ class aplicativo:
         user.nome = self.entNome.get()
         user.telefone = self.entTelefone.get()
         user.email = self.entEmail.get()
-        user.usuario = self.entUsuario.get()
-        user.senha = self.entSenha.get()
 
         self.entID.delete(0, END)
         self.entNome.delete(0, END)
         self.entTelefone.delete(0, END)
         self.entEmail.delete(0, END)
-        self.entUsuario.delete(0, END)
-        self.entSenha.delete(0, END)
 
         self.msg["text"] = user.updateUser()
         self.atualizarTreeView()

@@ -1,9 +1,9 @@
 from tkinter import *
-from usuarios import usuarios
-from cidades import cidades
+from usuarios import *
+from cidades import *
 
 def abrir_cadastro():
-    app = usuarios(master=janela)
+    app = aplicativo(master=janela)
     botao.pack_forget()
     botao2.pack_forget()
 

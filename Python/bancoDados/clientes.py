@@ -83,12 +83,12 @@ class appClientes:
         self.txtCidade = Label(self.containerComboBox,text = "Seleção de cidades")
         self.txtCidade.pack()
 
-        #self.combo = ttk.Combobox(self.containerComboBox, values=[self.buscarCombo()])
-        #self.combo.pack(pady=20)
+        self.combo = ttk.Combobox(self.containerComboBox, values=[self.buscarCombo()])
+        self.combo.pack(pady=20)
 
-        self.b = Button()
-        self.b["command"] = self.buscarCombo
-        self.b.pack()
+        #self.b = Button()
+        #self.b["command"] = self.buscarCombo
+        #self.b.pack()
 
 
 
@@ -240,8 +240,7 @@ class appClientes:
         cli = cliente()
         result = cli.buscarComboBox()
 
-        for resultado in result:
-            self.msg["text"] = resultado
+        return result
 
 
 if __name__ == "__main__":

@@ -19,7 +19,7 @@ class banco():
                   )""")
         c.execute("""create table if not exists cidades (
                   id integer primary key autoincrement,
-                  nome text,
+                  cidade text,
                   estado text
                   )""")
         c.execute("""create table if not exists clientes (
@@ -28,7 +28,8 @@ class banco():
                   nome text,
                   telefone text,
                   email text,
-                  endereco text
+                  endereco text,
+                  FOREIGN KEY (id) REFERENCES cidades(id)
                   )""")
       
         self.conexao.commit()

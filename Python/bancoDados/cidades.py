@@ -33,7 +33,7 @@ class cidades():
         self.botaoID["command"] = self.buscarCidade
         self.botaoID.pack()
 
-        self.txtNome = Label(self.container02, text = "Nome:")
+        self.txtNome = Label(self.container02, text = "Cidade:")
         self.txtNome.pack(side = LEFT)
 
         self.entNome = Entry(self.container02)
@@ -44,6 +44,7 @@ class cidades():
 
         self.entEstado = Entry(self.container03)
         self.entEstado.pack(side = LEFT)
+        
 
         self.botao = Button(self.container04, text = "Cadastrar", width = 12)
         self.botao["command"] = self.cadastrarCidade
@@ -65,7 +66,7 @@ class cidades():
     def cadastrarCidade(self):
         c = cid()
         
-        c.nome = self.entNome.get()
+        c.cidade = self.entNome.get()
         c.estado = self.entEstado.get()
 
         self.entNome.delete(0, END)
@@ -123,9 +124,9 @@ class cidades():
     def createTreeView(self, root):
         c = cid()
 
-        self.tree = ttk.Treeview(root, columns=("ID", "Nome", "Estado"), show = "headings")
+        self.tree = ttk.Treeview(root, columns=("ID", "Cidade", "Estado"), show = "headings")
         self.tree.heading("ID", text = "ID")
-        self.tree.heading("Nome", text = "Nome")
+        self.tree.heading("Cidade", text = "Cidade")
         self.tree.heading("Estado", text = "Estado")
         self.tree.pack(fill = BOTH, expand = True)
         

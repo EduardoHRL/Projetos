@@ -2,10 +2,10 @@ from banco import banco
 
 class cid(object):
 
-    def __init__(self,id= 0 , nome = "", estado =""):
+    def __init__(self,id= 0 , cidade = "", estado =""):
         self.info = {}
         self.id = id
-        self.nome = nome
+        self.cidade = cidade
         self.estado  = estado
 
     def cadastrarCidade(self):
@@ -13,7 +13,7 @@ class cid(object):
         try:
             c = b.conexao.cursor()
 
-            c.execute("insert into cidades(nome, estado) values ('"+self.nome+"', '"+self.estado+"')")
+            c.execute("insert into cidades(cidade, estado) values ('"+self.cidade+"', '"+self.estado+"')")
             b.conexao.commit()
 
             c.close()
@@ -26,7 +26,7 @@ class cid(object):
         try:
             c = b.conexao.cursor()
 
-            c.execute("update cidades set nome = '" + self.nome+ "', estado = '"+self.estado+"' where id = "+self.id+" ")
+            c.execute("update cidades set nome = '" + self.cidade+ "', estado = '"+self.estado+"' where id = "+self.id+" ")
 
 
             b.conexao.commit()
@@ -60,7 +60,7 @@ class cid(object):
 
             for linha in c:
                 self.id = linha[0]
-                self.nome = linha[1]
+                self.cidade = linha[1]
                 self.estado = linha[2]
 
             c.close()

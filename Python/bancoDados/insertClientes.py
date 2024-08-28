@@ -1,73 +1,77 @@
 from banco import banco
 
-class cid(object):
+class cliente(object):
 
-    def __init__(self,id= 0,cpf = "" , nome = "", telefone ="", email = "", endereco = ""):
+    def __init__(self,id= 0, nome = "", telefone ="", email = "", endereco = "",cpf = "", cidade = ""):
         self.info = {}
         self.id = id
-        self.cpf = cpf
         self.nome = nome
         self.telefone = telefone
         self.email = email
         self.endereco = endereco
+        self.cpf = cpf
+        self.cidade = cidade
 
-    def cadastrarCliente(self):
+    def insertCliente(self):
         b = banco()
         try:
             c = b.conexao.cursor()
 
-            c.execute("insert into clientes(cpf, nome, telefone, email, endereco) values ('"+self.nome+"', '"+self.estado+"')")
+            c.execute("insert into clientes(nome, telefone, email, endereco,cpf) values ('"+self.nome+"', '"+self.telefone+"', '"+self.email+"', '"+self.endereco+"', '"+self.cpf+"')")
             b.conexao.commit()
 
             c.close()
-            return "Cidade cadastrada com sucesso!"
+            return "Cliente cadastrado com sucesso!"
         except:
             return "Ocorreu um erro"
         
-    def updateCidade(self):
+    def updateCliente(self):
         b = banco()
         try:
             c = b.conexao.cursor()
 
-            c.execute("update cidades set nome = '" + self.nome+ "', estado = '"+self.estado+"' where id = "+self.id+" ")
+            c.execute("update cidades set nome = '" + self.nome+ "', telefone = '"+self.telefone+"', email = '"+self.email+"', endereco = '"+self.endereco+"', cpf = '"+self.cpf+"' where id = "+self.id+" ")
 
 
             b.conexao.commit()
             c.close()
 
-            return "Cidade atualizado com sucesso!"
+            return "Cliente atualizado com sucesso!"
         except:
-            return "Ocorreu um erro na alteração da cidade!"
+            return "Ocorreu um erro na alteração do cliente!"
         
-    def deleteCidade(self):
+    def deleteCliente(self):
         b = banco()
         try:
             c = b.conexao.cursor()
 
-            c.execute("delete from cidades where id = "+self.id+" ")
+            c.execute("delete from clientes where id = "+self.id+" ")
 
             b.conexao.commit()
 
             c.close()
 
-            return "Cidade excluida com sucesso"
+            return "Cliente excluido com sucesso"
         except:
-            return "Cidade nao foi excluida"
+            return "Cliente nao foi excluido"
         
-    def buscarCidade(self):
+    def selectCliente(self):
         b = banco()
         try:
             c = b.conexao.cursor()
 
-            c.execute("select * from cidades where id = "+self.id+" ")
+            c.execute("select * from clientes where id = "+self.id+" ")
 
             for linha in c:
                 self.id = linha[0]
                 self.nome = linha[1]
-                self.estado = linha[2]
+                self.telefone = linha[2]
+                self.email = linha[3]
+                self.endereco = linha[4]
+                self.cpf = linha[5]
 
             c.close()
-            return "Cidade buscada com sucesso"
+            return "Cliente buscado com sucesso"
         except:
             return "Busca não efetuada com sucesso"
         
@@ -75,14 +79,27 @@ class cid(object):
         b = banco()
         c = b.conexao.cursor()
         
-        c.execute("SELECT * FROM cidades")
+        c.execute("SELECT * FROM clientes")
 
         rows = []
 
         for linha in c:
-            rows.append((linha[0], linha[1], linha[2]))
+            rows.append((linha[0], linha[1], linha[2], linha[3], linha[4], linha[5]))
 
         c.close()
         
         return rows
+    
+    def buscarComboBox(self):
+        b = banco()
+        c = b.conexao.cursor()
 
+        c.execute("select cidade FROM cidades")
+
+        resultado = []
+
+        for linha in c:
+            resultado = ((linha))
+
+        c.close()
+        return resultado

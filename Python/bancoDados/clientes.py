@@ -1,12 +1,13 @@
 from tkinter import *
 from tkinter import ttk
 
-from insertUsuarios import *
+from insertClientes import *
 
-class aplicativo:
+
+class appClientes:
     def __init__(self, master = None):
         self.fontePadrao = ("Arial", "10")
-        
+
         self.primeiroContainer = Frame(master)
         self.primeiroContainer.pack(pady = 20)
 
@@ -27,6 +28,9 @@ class aplicativo:
 
         self.sextoContainer = Frame(master)
         self.sextoContainer.pack(pady = 5, padx = 20)
+
+        self.containerComboBox = Frame(master)
+        self.containerComboBox.pack(pady = 5, padx = 20)
 
         self.setimoContainer = Frame(master)
         self.setimoContainer.pack(pady = 5, padx = 20)
@@ -76,17 +80,28 @@ class aplicativo:
         self.entCpf["width"] =25
         self.entCpf.pack()
 
+        self.txtCidade = Label(self.containerComboBox,text = "Seleção de cidades")
+        self.txtCidade.pack()
+
+        #self.combo = ttk.Combobox(self.containerComboBox, values=[self.buscarCombo()])
+        #self.combo.pack(pady=20)
+
+        self.b = Button()
+        self.b["command"] = self.buscarCombo
+        self.b.pack()
+
+
 
         self.botInsert = Button(self.setimoContainer,text="Inserir", width = 12)
-        self.botInsert["command"] = self.inserirUsuario
+        self.botInsert["command"] = self.inserirCliente
         self.botInsert.pack(side = LEFT)
 
         self.botAlterar = Button(self.setimoContainer, text = "Alterar", width = 12)
-        self.botAlterar["command"] = self.alterarUsuario
+        self.botAlterar["command"] = self.alterarCliente
         self.botAlterar.pack(side = LEFT)
 
         self.botExcluir = Button(self.setimoContainer,text = "Excluir", width = 12)
-        self.botExcluir["command"] = self.excluirUsuario
+        self.botExcluir["command"] = self.excluirCliente
         self.botExcluir.pack(side = LEFT)
 
         self.botLimpar = Button(self.setimoContainer, text = "Limpar", width = 12)
@@ -103,104 +118,109 @@ class aplicativo:
         self.entNome.delete(0, END)
         self.entTelefone.delete(0, END)
         self.entEmail.delete(0, END)
-        self.entUsuario.delete(0, END)
-        self.entSenha.delete(0, END)
+        self.entEndereco.delete(0, END)
+        self.entCpf.delete(0, END)
 
     def inserirCliente(self):
-        user = usuarios()
+        cli = cliente()
 
-        user.nome = self.entNome.get()
-        user.telefone = self.entTelefone.get()
-        user.email = self.entEmail.get()
-        user.usuario = self.entUsuario.get()
-        user.senha = self.entSenha.get()
+        cli.nome = self.entNome.get()
+        cli.telefone = self.entTelefone.get()
+        cli.email = self.entEmail.get()
+        cli.endereco = self.entEndereco.get()
+        cli.cpf = self.entCpf.get()
 
         self.entID.delete(0, END)
         self.entNome.delete(0, END)
         self.entTelefone.delete(0, END)
         self.entEmail.delete(0, END)
-        self.entUsuario.delete(0, END)
-        self.entSenha.delete(0, END)
+        self.entEndereco.delete(0, END)
+        self.entCpf.delete(0, END)
 
-        self.msg["text"] = user.insertUser()
+        self.msg["text"] = cli.insertCliente()
         self.atualizarTreeView()
 
     def alterarCliente(self):
-        user = usuarios()
+        cli = cliente()
 
-        self.msg["text"] = user.updateUser()
+        self.msg["text"] = cli.updateCliente()
 
-        user.id = self.entID.get()
-        user.nome = self.entNome.get()
-        user.telefone = self.entTelefone.get()
-        user.email = self.entEmail.get()
+        cli.id = self.entID.get()
+        cli.nome = self.entNome.get()
+        cli.telefone = self.entTelefone.get()
+        cli.email = self.entEmail.get()
+        cli.endereco = self.entEndereco.get()
+        cli.cpf = self.entCpf.get()
 
         self.entID.delete(0, END)
         self.entNome.delete(0, END)
         self.entTelefone.delete(0, END)
         self.entEmail.delete(0, END)
+        self.entEndereco.delete(0, END)
+        self.entCpf.delete(0, END)
 
-        self.msg["text"] = user.updateUser()
+        self.msg["text"] = cli.updateCliente()
         self.atualizarTreeView()
 
-    def excluirUsuario(self):
-        user = usuarios()
+    def excluirCliente(self):
+        cli = cliente()
 
-        user.id = self.entID.get()
+        cli.id = self.entID.get()
 
-        self.msg["text"] = user.deleteUser()
+        self.msg["text"] = cli.deleteCliente()
 
         self.entID.delete(0, END)
         self.entNome.delete(0, END)
         self.entTelefone.delete(0, END)
         self.entEmail.delete(0, END)
-        self.entUsuario.delete(0, END)
-        self.entSenha.delete(0, END)
+        self.entEndereco.delete(0, END)
+        self.entCpf.delete(0, END)
         
         self.atualizarTreeView()
 
     def buscarUsuario(self):
-        user = usuarios()
+        cli = cliente()
 
-        user.id = self.entID.get()
+        cli.id = self.entID.get()
 
-        self.msg["text"] = user.selectUser()
+        self.msg["text"] = cli.selectCliente()
 
         self.entID.delete(0, END)
-        self.entID.insert(INSERT, user.id)
+        self.entID.insert(INSERT, cli.id)
 
         self.entNome.delete(0, END)
-        self.entNome.insert(INSERT, user.nome)
+        self.entNome.insert(INSERT, cli.nome)
 
         self.entTelefone.delete(0, END)
-        self.entTelefone.insert(INSERT,user.telefone)
+        self.entTelefone.insert(INSERT,cli.telefone)
 
         self.entEmail.delete(0, END)
-        self.entEmail.insert(INSERT, user.email)
+        self.entEmail.insert(INSERT, cli.email)
 
-        self.entUsuario.delete(0, END)
-        self.entUsuario.insert(INSERT, user.usuario)
+        self.entEndereco.delete(0, END)
+        self.entEndereco.insert(INSERT, cli.endereco)
 
-        self.entSenha.delete(0, END)
-        self.entSenha.insert(INSERT,user.senha)
+        self.entCpf.delete(0, END)
+        self.entCpf.insert(INSERT, cli.cpf)
 
 
     def createTreeView(self, root):
         
-        user = usuarios()
+        cli = cliente()
 
-        self.tree = ttk.Treeview(root, columns=("ID", "Nome", "Telefone", "Email", "Usuario", "Senha"), show = "headings")
+        self.tree = ttk.Treeview(root, columns=("ID", "Nome", "Telefone", "Email", "Endereco", "CPF"), show = "headings")
         self.tree.heading("ID", text = "ID")
         self.tree.heading("Nome", text = "Nome")
         self.tree.heading("Telefone", text = "Telefone")
         self.tree.heading("Email", text = "Email")
-        self.tree.heading("Usuario", text = "Usuario")
-        self.tree.heading("Senha", text = "Senha")
+        self.tree.heading("Endereco", text = "Endereco")
+        self.tree.heading("CPF", text= "CPF")
+        
         self.tree.pack(fill = BOTH, expand = True)
 
         for item in self.tree.get_children():
             self.tree.delete(item)
-        rows = user.buscarTreeView()
+        rows = cli.buscarTreeView()
 
         for row in rows:
             self.tree.insert("", END, values=row)
@@ -210,15 +230,23 @@ class aplicativo:
         for item in self.tree.get_children():
             self.tree.delete(item)
 
-        user = usuarios()
-        rows = user.buscarTreeView()
+        cli = cliente()
+        rows = cli.buscarTreeView()
 
         for row in rows:
             self.tree.insert("", END, values=row)
 
-        
+    def buscarCombo(self):
+        cli = cliente()
+        result = cli.buscarComboBox()
+
+        for resultado in result:
+            self.msg["text"] = resultado
+
+
 if __name__ == "__main__":
     root = Tk()
-    app = aplicativo(root)
-
+    appClientes(root)
     root.mainloop()
+
+        

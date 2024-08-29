@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 
 from insertClientes import *
 
@@ -105,9 +106,6 @@ class appClientes:
         self.botLimpar["command"] = self.Limpar
         self.botLimpar.pack(side = LEFT)
 
-        self.msg = Label(text = "")
-        self.msg.pack()
-
         self.tree = self.createTreeView(master)
 
     def Limpar(self):
@@ -118,6 +116,8 @@ class appClientes:
         self.entEndereco.delete(0, END)
         self.entCpf.delete(0, END)
         self.combo.delete(0, END)
+
+        messagebox.showinfo("Limpeza", "Campos Limpos")
 
     def inserirCliente(self):
         cli = cliente()
@@ -137,13 +137,13 @@ class appClientes:
         self.entCpf.delete(0, END)
         self.combo.delete(0, END)
 
-        self.msg["text"] = cli.insertCliente()
+        result = cli.insertCliente()
+        messagebox.showinfo("Inserir", result)
+
         self.atualizarTreeView()
 
     def alterarCliente(self):
         cli = cliente()
-
-        self.msg["text"] = cli.updateCliente()
 
         cli.id = self.entID.get()
         cli.nome = self.entNome.get()
@@ -161,7 +161,9 @@ class appClientes:
         self.entCpf.delete(0, END)
         self.combo.delete(0, END)
 
-        self.msg["text"] = cli.updateCliente()
+        result = cli.updateCliente()
+        messagebox.showinfo("Alterar", result)
+        
         self.atualizarTreeView()
 
     def excluirCliente(self):
@@ -169,7 +171,8 @@ class appClientes:
 
         cli.id = self.entID.get()
 
-        self.msg["text"] = cli.deleteCliente()
+        result = cli.deleteCliente()
+        messagebox.showinfo("Deletar", result)
 
         self.entID.delete(0, END)
         self.entNome.delete(0, END)
@@ -186,7 +189,8 @@ class appClientes:
 
         cli.id = self.entID.get()
 
-        self.msg["text"] = cli.selectCliente()
+        result = cli.selectCliente()
+        messagebox.showinfo("Busca", result)
 
         self.entID.delete(0, END)
         self.entID.insert(INSERT, cli.id)
@@ -222,7 +226,7 @@ class appClientes:
         self.tree.heading("Endereco", text = "Endereco")
         self.tree.heading("CPF", text= "CPF")
         self.tree.heading("Cidade", text = "Cidade")
-        
+        self.tree.bind("<<TreeviewSelect>>", self.selecionaCliente)
         self.tree.pack(fill = BOTH, expand = True)
 
         for item in self.tree.get_children():
@@ -248,6 +252,33 @@ class appClientes:
         result = cli.buscarComboBox()
 
         return result
+    
+    def selecionaCliente(self, event):
+        seleciona_item = self.tree.selection()
+        if seleciona_item:
+            item = seleciona_item[0]
+            values = self.tree.item(item, 'values')
+
+            self.entID.delete(0, END)
+            self.entID.insert(INSERT, values[0])
+
+            self.entNome.delete(0, END)
+            self.entNome.insert(INSERT, values[1])
+
+            self.entTelefone.delete(0, END)
+            self.entTelefone.insert(INSERT, values[2])
+
+            self.entEmail.delete(0, END)
+            self.entEmail.insert(INSERT, values[3])
+
+            self.entEndereco.delete(0, END)
+            self.entEndereco.insert(INSERT, values[4])
+
+            self.entCpf.delete(0, END)
+            self.entCpf.insert(INSERT, values[5])
+
+            self.combo.delete(0, END)
+            self.combo.insert(INSERT, values[6])
     
 
 

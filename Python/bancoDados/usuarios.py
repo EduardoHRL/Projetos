@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 
 from insertUsuarios import *
 
@@ -91,9 +92,6 @@ class aplicativo:
         self.botLimpar["command"] = self.Limpar
         self.botLimpar.pack(side = LEFT)
 
-        self.msg = Label(text = "")
-        self.msg.pack()
-
         self.tree = self.createTreeView(master)
 
     def Limpar(self):
@@ -103,6 +101,8 @@ class aplicativo:
         self.entEmail.delete(0, END)
         self.entUsuario.delete(0, END)
         self.entSenha.delete(0, END)
+
+        messagebox.showinfo("Limpar", "Campos limpos")
 
     def inserirUsuario(self):
         user = usuarios()
@@ -120,13 +120,13 @@ class aplicativo:
         self.entUsuario.delete(0, END)
         self.entSenha.delete(0, END)
 
-        self.msg["text"] = user.insertUser()
+        result = user.insertUser()
+        messagebox.showinfo("Inserir", result)
+
         self.atualizarTreeView()
 
     def alterarUsuario(self):
         user = usuarios()
-
-        self.msg["text"] = user.updateUser()
 
         user.id = self.entID.get()
         user.nome = self.entNome.get()
@@ -141,8 +141,10 @@ class aplicativo:
         self.entEmail.delete(0, END)
         self.entUsuario.delete(0, END)
         self.entSenha.delete(0, END)
+        
+        result = user.updateUser()
+        messagebox.showinfo("Alterar", result)
 
-        self.msg["text"] = user.updateUser()
         self.atualizarTreeView()
 
     def excluirUsuario(self):
@@ -150,7 +152,8 @@ class aplicativo:
 
         user.id = self.entID.get()
 
-        self.msg["text"] = user.deleteUser()
+        result = user.deleteUser()
+        messagebox.showinfo("Excluir", result)
 
         self.entID.delete(0, END)
         self.entNome.delete(0, END)
@@ -166,7 +169,8 @@ class aplicativo:
 
         user.id = self.entID.get()
 
-        self.msg["text"] = user.selectUser()
+        result = user.selectUser()
+        messagebox.showinfo("Busca", result)
 
         self.entID.delete(0, END)
         self.entID.insert(INSERT, user.id)
@@ -198,6 +202,7 @@ class aplicativo:
         self.tree.heading("Email", text = "Email")
         self.tree.heading("Usuario", text = "Usuario")
         self.tree.heading("Senha", text = "Senha")
+        self.tree.bind("<<TreeviewSelect>>", self.selecionaUsuario)
         self.tree.pack(fill = BOTH, expand = True)
 
         for item in self.tree.get_children():
@@ -217,6 +222,31 @@ class aplicativo:
 
         for row in rows:
             self.tree.insert("", END, values=row)
+
+    def selecionaUsuario(self, event):
+        seleciona_item = self.tree.selection()
+        if seleciona_item:
+            item = seleciona_item[0]
+            values = self.tree.item(item, 'values')
+
+            self.entID.delete(0, END)
+            self.entID.insert(INSERT, values[0])
+
+            self.entNome.delete(0, END)
+            self.entNome.insert(INSERT, values[1])
+
+            self.entTelefone.delete(0, END)
+            self.entTelefone.insert(INSERT, values[2])
+
+            self.entEmail.delete(0, END)
+            self.entEmail.insert(INSERT, values[3])
+
+            self.entUsuario.delete(0, END)
+            self.entUsuario.insert(INSERT, values[4])
+
+            self.entSenha.delete(0, END)
+            self.entSenha.insert(INSERT, values[5])
+
 
         
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 from insertCidades import *
 
 class cidades():
@@ -58,10 +59,19 @@ class cidades():
         self.botaoExcluir["command"] = self.excluirCidade
         self.botaoExcluir.pack(side = LEFT)
 
-        self.msg = Label(text = "")
-        self.msg.pack()
+        self.botaoLimpar = Button(self.container04, text = "Limpar", width = 12)
+        self.botaoLimpar["command"] = self.limpar
+        self.botaoLimpar.pack(side = LEFT)
 
         self.tree = self.createTreeView(master)
+
+    def limpar(self):
+        c = cid()
+        self.entID.delete(0, END)
+        self.entNome.delete(0, END)
+        self.entEstado.delete(0, END)
+
+        messagebox.showinfo("","Campos Limpos")
 
     def cadastrarCidade(self):
         c = cid()
@@ -72,14 +82,15 @@ class cidades():
         self.entNome.delete(0, END)
         self.entEstado.delete(0, END)
 
-        self.msg["text"] = c.cadastrarCidade()
+        result = c.cadastrarCidade()
+        messagebox.showinfo("Cadastro", result)
+
 
         self.atualizarTreeView()
 
     def alterarCidade(self):
         c = cid()
  
-
         c.id = self.entID.get()
         c.cidade = self.entNome.get()
         c.estado = self.entEstado.get()
@@ -88,7 +99,8 @@ class cidades():
         self.entNome.delete(0, END)
         self.entEstado.delete(0, END)
 
-        self.msg["text"] = c.updateCidade()
+        result = c.updateCidade()
+        messagebox.showinfo("Alteração", result)
 
         self.atualizarTreeView()
 
@@ -97,11 +109,12 @@ class cidades():
 
         c.id = self.entID.get()
         
-        self.msg["text"] = c.deleteCidade()
-        
         self.entID.delete(0, END)
         self.entNome.delete(0, END)
         self.entEstado.delete(0, END)
+
+        result = c.deleteCidade()
+        messagebox.showinfo("Deletar", result)
 
         self.atualizarTreeView()
 
@@ -110,7 +123,8 @@ class cidades():
 
         c.id = self.entID.get()
 
-        self.msg["text"] = c.buscarCidade()
+        result = c.buscarCidade()
+        messagebox.showinfo("Buscar", result)
 
         self.entID.delete(0, END)
         self.entID.insert(INSERT, c.id)
@@ -121,6 +135,7 @@ class cidades():
         self.entEstado.delete(0, END)
         self.entEstado.insert(INSERT, c.estado)
 
+        
     def createTreeView(self, root):
         c = cid()
 

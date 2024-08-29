@@ -26,7 +26,7 @@ class cid(object):
         try:
             c = b.conexao.cursor()
 
-            c.execute("update cidades set nome = '" + self.cidade+ "', estado = '"+self.estado+"' where id = "+self.id+" ")
+            c.execute("update cidades set cidade = '" + self.cidade+ "', estado = '"+self.estado+"' where id = "+self.id+" ")
 
 
             b.conexao.commit()

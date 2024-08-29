@@ -24,11 +24,12 @@ class banco():
                   )""")
         c.execute("""create table if not exists clientes (
                   id integer primary key autoincrement,
-                  cpf text,
                   nome text,
                   telefone text,
                   email text,
                   endereco text,
+                    cpf text,
+                  cidade integer,
                   FOREIGN KEY (id) REFERENCES cidades(id)
                   )""")
       

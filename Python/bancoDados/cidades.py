@@ -81,7 +81,7 @@ class cidades():
  
 
         c.id = self.entID.get()
-        c.nome = self.entNome.get()
+        c.cidade = self.entNome.get()
         c.estado = self.entEstado.get()
 
         self.entID.delete(0, END)
@@ -116,7 +116,7 @@ class cidades():
         self.entID.insert(INSERT, c.id)
 
         self.entNome.delete(0, END)
-        self.entNome.insert(INSERT, c.nome)
+        self.entNome.insert(INSERT, c.cidade)
 
         self.entEstado.delete(0, END)
         self.entEstado.insert(INSERT, c.estado)
@@ -128,6 +128,7 @@ class cidades():
         self.tree.heading("ID", text = "ID")
         self.tree.heading("Cidade", text = "Cidade")
         self.tree.heading("Estado", text = "Estado")
+        self.tree.bind("<<TreeviewSelect>>", self.selecionaCidade)
         self.tree.pack(fill = BOTH, expand = True)
         
         for item in self.tree.get_children():
@@ -148,6 +149,22 @@ class cidades():
 
         for row in rows:
             self.tree.insert("", END, values=row)
+    
+    def selecionaCidade(self, event):
+        seleciona_item = self.tree.selection()
+        if seleciona_item:
+            item = seleciona_item[0]
+            values = self.tree.item(item, 'values')
+
+            self.entID.delete(0, END)
+            self.entID.insert(INSERT, values[0])
+
+            self.entNome.delete(0, END)
+            self.entNome.insert(INSERT, values[1])
+
+            self.entEstado.delete(0, END)
+            self.entEstado.insert(INSERT, values[2])
+
 
 if __name__ == "__main__":
     root = Tk()

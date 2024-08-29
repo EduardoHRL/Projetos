@@ -17,7 +17,7 @@ class cliente(object):
         try:
             c = b.conexao.cursor()
 
-            c.execute("insert into clientes(nome, telefone, email, endereco,cpf) values ('"+self.nome+"', '"+self.telefone+"', '"+self.email+"', '"+self.endereco+"', '"+self.cpf+"')")
+            c.execute("insert into clientes(nome, telefone, email, endereco,cpf, cidade) values ('"+self.nome+"', '"+self.telefone+"', '"+self.email+"', '"+self.endereco+"', '"+self.cpf+"', '"+self.cidade+"')")
             b.conexao.commit()
 
             c.close()
@@ -30,7 +30,7 @@ class cliente(object):
         try:
             c = b.conexao.cursor()
 
-            c.execute("update cidades set nome = '" + self.nome+ "', telefone = '"+self.telefone+"', email = '"+self.email+"', endereco = '"+self.endereco+"', cpf = '"+self.cpf+"' where id = "+self.id+" ")
+            c.execute("update clientes set nome = '" + self.nome+ "', telefone = '"+self.telefone+"', email = '"+self.email+"', endereco = '"+self.endereco+"', cpf = '"+self.cpf+"', cidade = '"+self.cidade+"' where id = "+self.id+" ")
 
 
             b.conexao.commit()
@@ -69,6 +69,7 @@ class cliente(object):
                 self.email = linha[3]
                 self.endereco = linha[4]
                 self.cpf = linha[5]
+                self.cidade = linha[6]
 
             c.close()
             return "Cliente buscado com sucesso"
@@ -84,7 +85,7 @@ class cliente(object):
         rows = []
 
         for linha in c:
-            rows.append((linha[0], linha[1], linha[2], linha[3], linha[4], linha[5]))
+            rows.append((linha[0], linha[1], linha[2], linha[3], linha[4], linha[5], linha[6]))
 
         c.close()
         
@@ -99,7 +100,7 @@ class cliente(object):
         resultado = []
 
         for linha in c:
-            resultado = ((linha))
+            resultado.append(linha[0])
 
         c.close()
         return resultado

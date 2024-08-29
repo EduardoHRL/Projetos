@@ -1,24 +1,69 @@
 from tkinter import *
+from tkinter import filedialog
 from usuarios import *
 from cidades import *
+from clientes import *
 
-def abrir_cadastro():
-    app = aplicativo(master=janela)
-    botao.pack_forget()
-    botao2.pack_forget()
+root = Tk()
+menubar = Menu(root)
+root.config(menu=menubar)
 
-def abrir_cadastro_cidades():
-    app = cidades(master = janela)
-    botao2.pack_forget()
-    botao.pack_forget()
+root.title("Inicio")
+root.state('zoomed')
 
-janela = Tk()
+filemenu = Menu(menubar)
+filemenu2 = Menu(menubar)
+filemenu3 = Menu(menubar)
 
-botao = Button(janela, text="Abrir Cadastro de Usuários", command=abrir_cadastro)
-botao.pack()
+menubar.add_cascade(label='Arquivo', menu=filemenu)
+menubar.add_cascade(label='Cadastros', menu=filemenu2)
+menubar.add_cascade(label='Ajuda', menu=filemenu3)
 
-botao2 = Button(janela, text="Abrir cadastro de cidades", command=abrir_cadastro_cidades)
-botao2.pack()
+# Frame para exibir o conteúdo
+container = Frame(root)
+container.pack(fill=BOTH, expand=True)
 
+def clear_frame():
+    for widget in container.winfo_children():
+        widget.destroy()
 
-janela.mainloop()
+def abrirUsuarios():
+    clear_frame()
+    app = aplicativo(master=container)
+    app.pack(fill=BOTH, expand=True)
+
+def abrirCidades():
+    clear_frame()
+    app = cidades(master=container)
+    app.pack(fill=BOTH, expand=True)
+
+def abrirClientes():
+    clear_frame()
+    app = appClientes(master=container)
+    app.pack(fill=BOTH, expand=True)
+
+def Open():
+    filedialog.askopenfilename()
+
+def Save():
+    filedialog.asksaveasfilename()
+
+def Quit():
+    root.destroy()
+
+def Help():
+    clear_frame()
+    text = Text(container)
+    text.pack(fill=BOTH, expand=True)
+    text.insert('insert', 'Essa página abrirá três cadastros: Usuários, Cidades e Clientes')
+
+filemenu.add_command(label='Abrir...', command=Open)
+filemenu.add_command(label='Salvar como...', command=Save)
+filemenu.add_separator()
+filemenu.add_command(label='Sair', command=Quit)
+filemenu2.add_command(label='Usuários', command=abrirUsuarios)
+filemenu2.add_command(label='Cidades', command=abrirCidades)
+filemenu2.add_command(label='Clientes', command=abrirClientes)
+filemenu3.add_command(label='Ajuda', command=Help)
+
+root.mainloop()

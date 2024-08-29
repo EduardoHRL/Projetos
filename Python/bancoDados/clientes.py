@@ -35,6 +35,9 @@ class appClientes:
         self.setimoContainer = Frame(master)
         self.setimoContainer.pack(pady = 5, padx = 20)
 
+        self.oitavoContainer = Frame(master)
+        self.oitavoContainer.pack(pady = 5, padx = 20)
+
 
         self.cad = Label(self.primeiroContainer, text = "Cadastro de Clientes")
         self.cad.pack()
@@ -80,17 +83,11 @@ class appClientes:
         self.entCpf["width"] =25
         self.entCpf.pack()
 
-        self.txtCidade = Label(self.containerComboBox,text = "Seleção de cidades")
-        self.txtCidade.pack()
+        self.txtCidade = Label(self.containerComboBox, text = "Cidade:", font = self.fontePadrao, width = 10)
+        self.txtCidade.pack(side = LEFT)
 
-        self.combo = ttk.Combobox(self.containerComboBox, values=[self.buscarCombo()])
-        self.combo.pack(pady=20)
-
-        #self.b = Button()
-        #self.b["command"] = self.buscarCombo
-        #self.b.pack()
-
-
+        self.combo = ttk.Combobox(self.containerComboBox, values=self.buscarCombo())
+        self.combo.pack(side = LEFT)
 
         self.botInsert = Button(self.setimoContainer,text="Inserir", width = 12)
         self.botInsert["command"] = self.inserirCliente
@@ -120,6 +117,7 @@ class appClientes:
         self.entEmail.delete(0, END)
         self.entEndereco.delete(0, END)
         self.entCpf.delete(0, END)
+        self.combo.delete(0, END)
 
     def inserirCliente(self):
         cli = cliente()
@@ -129,6 +127,7 @@ class appClientes:
         cli.email = self.entEmail.get()
         cli.endereco = self.entEndereco.get()
         cli.cpf = self.entCpf.get()
+        cli.cidade = self.combo.get()
 
         self.entID.delete(0, END)
         self.entNome.delete(0, END)
@@ -136,6 +135,7 @@ class appClientes:
         self.entEmail.delete(0, END)
         self.entEndereco.delete(0, END)
         self.entCpf.delete(0, END)
+        self.combo.delete(0, END)
 
         self.msg["text"] = cli.insertCliente()
         self.atualizarTreeView()
@@ -151,6 +151,7 @@ class appClientes:
         cli.email = self.entEmail.get()
         cli.endereco = self.entEndereco.get()
         cli.cpf = self.entCpf.get()
+        cli.cidade = self.combo.get()
 
         self.entID.delete(0, END)
         self.entNome.delete(0, END)
@@ -158,6 +159,7 @@ class appClientes:
         self.entEmail.delete(0, END)
         self.entEndereco.delete(0, END)
         self.entCpf.delete(0, END)
+        self.combo.delete(0, END)
 
         self.msg["text"] = cli.updateCliente()
         self.atualizarTreeView()
@@ -175,6 +177,7 @@ class appClientes:
         self.entEmail.delete(0, END)
         self.entEndereco.delete(0, END)
         self.entCpf.delete(0, END)
+        self.combo.delete(0, END)
         
         self.atualizarTreeView()
 
@@ -203,18 +206,22 @@ class appClientes:
         self.entCpf.delete(0, END)
         self.entCpf.insert(INSERT, cli.cpf)
 
+        self.combo.delete(0, END)
+        self.combo.insert(INSERT, cli.cidade)
+
 
     def createTreeView(self, root):
         
         cli = cliente()
 
-        self.tree = ttk.Treeview(root, columns=("ID", "Nome", "Telefone", "Email", "Endereco", "CPF"), show = "headings")
+        self.tree = ttk.Treeview(root, columns=("ID", "Nome", "Telefone", "Email", "Endereco", "CPF", "Cidade"), show = "headings")
         self.tree.heading("ID", text = "ID")
         self.tree.heading("Nome", text = "Nome")
         self.tree.heading("Telefone", text = "Telefone")
         self.tree.heading("Email", text = "Email")
         self.tree.heading("Endereco", text = "Endereco")
         self.tree.heading("CPF", text= "CPF")
+        self.tree.heading("Cidade", text = "Cidade")
         
         self.tree.pack(fill = BOTH, expand = True)
 
@@ -241,6 +248,7 @@ class appClientes:
         result = cli.buscarComboBox()
 
         return result
+    
 
 
 if __name__ == "__main__":

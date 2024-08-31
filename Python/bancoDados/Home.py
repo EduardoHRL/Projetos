@@ -4,66 +4,75 @@ from usuarios import *
 from cidades import *
 from clientes import *
 
-root = Tk()
-menubar = Menu(root)
-root.config(menu=menubar)
+class Home():
+    def __init__(self, master = None):
+        self.root = Tk()
+        self.root.title("Início")
+        self.root.state('zoomed')
 
-root.title("Inicio")
-root.state('zoomed')
+        self.menubar = Menu(self.root)
+        self.root.config(menu=self.menubar)
 
-filemenu = Menu(menubar)
-filemenu2 = Menu(menubar)
-filemenu3 = Menu(menubar)
+        self.filemenu = Menu(self.menubar)
+        self.filemenu2 = Menu(self.menubar)
+        self.filemenu3 = Menu(self.menubar)
 
-menubar.add_cascade(label='Arquivo', menu=filemenu)
-menubar.add_cascade(label='Cadastros', menu=filemenu2)
-menubar.add_cascade(label='Ajuda', menu=filemenu3)
+        self.menubar.add_cascade(label='Arquivo', menu=self.filemenu)
+        self.menubar.add_cascade(label='Cadastros', menu=self.filemenu2)
+        self.menubar.add_cascade(label='Ajuda', menu=self.filemenu3)
 
-# Frame para exibir o conteúdo
-container = Frame(root)
-container.pack(fill=BOTH, expand=True)
+        self.container = Frame(self.root)
+        self.container.pack(fill=BOTH, expand=True)
 
-def clear_frame():
-    for widget in container.winfo_children():
-        widget.destroy()
+        self.create_menu()
 
-def abrirUsuarios():
-    clear_frame()
-    app = aplicativo(master=container)
-    app.pack(fill=BOTH, expand=True)
+    def create_menu(self):
+        def clear_frame():
+            for widget in self.container.winfo_children():
+                widget.destroy()
 
-def abrirCidades():
-    clear_frame()
-    app = cidades(master=container)
-    app.pack(fill=BOTH, expand=True)
+        def abrirUsuarios():
+            clear_frame()
+            app = aplicativo(master=self.container)
+            app.pack(fill=BOTH, expand=True)
 
-def abrirClientes():
-    clear_frame()
-    app = appClientes(master=container)
-    app.pack(fill=BOTH, expand=True)
+        def abrirCidades():
+            clear_frame()
+            app = cidades(master=self.container)
+            app.pack(fill=BOTH, expand=True)
 
-def Open():
-    filedialog.askopenfilename()
+        def abrirClientes():
+            clear_frame()
+            app = appClientes(master=self.container)
+            app.pack(fill=BOTH, expand=True)
 
-def Save():
-    filedialog.asksaveasfilename()
+        def Open():
+            filedialog.askopenfilename()
 
-def Quit():
-    root.destroy()
+        def Save():
+            filedialog.asksaveasfilename()
 
-def Help():
-    clear_frame()
-    text = Text(container)
-    text.pack(fill=BOTH, expand=True)
-    text.insert('insert', 'Essa página abrirá três cadastros: Usuários, Cidades e Clientes')
+        def Quit():
+            self.root.destroy()
 
-filemenu.add_command(label='Abrir...', command=Open)
-filemenu.add_command(label='Salvar como...', command=Save)
-filemenu.add_separator()
-filemenu.add_command(label='Sair', command=Quit)
-filemenu2.add_command(label='Usuários', command=abrirUsuarios)
-filemenu2.add_command(label='Cidades', command=abrirCidades)
-filemenu2.add_command(label='Clientes', command=abrirClientes)
-filemenu3.add_command(label='Ajuda', command=Help)
+        def Help():
+            clear_frame()
+            text = Text(self.container)
+            text.pack(fill=BOTH, expand=True)
+            text.insert('insert', 'Essa página abrirá três cadastros: Usuários, Cidades e Clientes')
 
-root.mainloop()
+        self.filemenu.add_command(label='Abrir...', command=Open)
+        self.filemenu.add_command(label='Salvar como...', command=Save)
+        self.filemenu.add_separator()
+        self.filemenu.add_command(label='Sair', command=Quit)
+        self.filemenu2.add_command(label='Usuários', command=abrirUsuarios)
+        self.filemenu2.add_command(label='Cidades', command=abrirCidades)
+        self.filemenu2.add_command(label='Clientes', command=abrirClientes)
+        self.filemenu3.add_command(label='Ajuda', command=Help)
+
+    def run(self):
+        self.root.mainloop()
+
+if __name__ == "__main__":
+    home = Home()
+    home.run()

@@ -1,10 +1,12 @@
 from tkinter import *
 from banco import *
 from tkinter import messagebox
-from Home import *
+from Principal import *
+import usuarios
 
 class login:
     def __init__(self, master = None):
+        self.master = master
         self.container = Frame(master)
         self.container.pack(pady = 20)
 
@@ -29,48 +31,53 @@ class login:
         self.txtSenha = Label(self.container03, text = "Senha")
         self.txtSenha.pack(side = LEFT)
 
-        self.entSenha = Entry(self.container03)
+        self.entSenha = Entry(self.container03, show = "*")
         self.entSenha.pack(side = LEFT)
 
-        self.botao = Button(self.container04,text = "Entrar", width = 10, command = self.abrir_principal)
+        self.botao = Button(self.container04,text = "Entrar", width = 10, command = self.logar)
         self.botao.pack()
 
         self.msg = Label(text = "")
         self.msg.pack()
 
+        self.txtCadastro = Label(text = "Não tem cadastro?")
+        self.txtCadastro.pack(pady = 10)
+
+        self.bntCadastro = Button(text = "Cadastrar", width = 10, command = self.abrir_cadastro)
+        self.bntCadastro.pack()
+
     def logar(self):
         b = banco()
         c = b.conexao.cursor()
 
-        c.execute("select usuario from usuarios")
-        for linha in c:
-            u = linha
-
-        c.execute("select senha from usuarios")
-        for linha in c:
-            s = linha
-
-        c.close()
-
         usu = self.entUsuario.get()
         senha = self.entSenha.get()
 
-        if usu in u and senha in s:
-            self.msg["text"] = "sim"
+        c.execute("SELECT usuario, senha FROM usuarios WHERE usuario = ? AND senha = ?", (usu, senha))
 
+        usu_found = c.fetchone()
+
+        c.close()
+
+        if usu_found:
+            self.master.destroy()
+            self.abrir_principal()
         else:
-            self.msg["text"] = "nao"
-    
+            self.msg["text"] = "Usuário e/ou senha incorretos"
+
     def abrir_principal(self):
-        for widget in self.master.winfo_children():
-            widget.destroy()
+        app = Home(master= root)
+        app.run()
 
-        # Create Home widgets
-        home_app = Home(master=self.master)
-        home_app.run()
+    def abrir_cadastro(self):
+        self.master.destroy() 
+        app = cadastro(master= Tk())
 
-root = Tk()
-root.geometry("300x200")
-root.resizable(False, False)
-login(root)
-root.mainloop()
+if __name__ == "__main__":
+    root = Tk()
+    root.title("Login")
+    root.geometry("300x250")
+    root.geometry("+500+210")
+    root.resizable(False, False)
+    login(root)
+    root.mainloop()

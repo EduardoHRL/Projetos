@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from insertCidades import *
 
-class cidades():
+class cidades:
     def __init__(self, master = None):
 
         self.container01 = Frame(master)
@@ -183,5 +183,6 @@ class cidades():
 
 if __name__ == "__main__":
     root = Tk()
+    root.state('zoomed')
     app = cidades(root)
     root.mainloop()

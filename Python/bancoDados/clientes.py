@@ -284,6 +284,7 @@ class appClientes:
 
 if __name__ == "__main__":
     root = Tk()
+    root.state('zoomed')
     appClientes(root)
     root.mainloop()
 

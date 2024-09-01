@@ -4,7 +4,7 @@ from usuarios import *
 from cidades import *
 from clientes import *
 
-class Home():
+class Home:
     def __init__(self, master = None):
         self.root = Tk()
         self.root.title("Início")
@@ -33,7 +33,7 @@ class Home():
 
         def abrirUsuarios():
             clear_frame()
-            app = aplicativo(master=self.container)
+            app = cadastro(master=self.container)
             app.pack(fill=BOTH, expand=True)
 
         def abrirCidades():

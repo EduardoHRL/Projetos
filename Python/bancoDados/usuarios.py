@@ -1,11 +1,12 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-
+import login
 from insertUsuarios import *
 
-class aplicativo:
+class cadastro:
     def __init__(self, master = None):
+        self.master = master
         self.fontePadrao = ("Arial", "10")
         
         self.primeiroContainer = Frame(master)
@@ -247,10 +248,8 @@ class aplicativo:
             self.entSenha.delete(0, END)
             self.entSenha.insert(INSERT, values[5])
 
-
-        
 if __name__ == "__main__":
     root = Tk()
-    app = aplicativo(root)
-
+    app = cadastro(root)
+    root.state('zoomed')
     root.mainloop()

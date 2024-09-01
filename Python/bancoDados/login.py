@@ -37,9 +37,6 @@ class login:
         self.botao = Button(self.container04,text = "Entrar", width = 10, command = self.logar)
         self.botao.pack()
 
-        self.msg = Label(text = "")
-        self.msg.pack()
-
         self.txtCadastro = Label(text = "Não tem cadastro?")
         self.txtCadastro.pack(pady = 10)
 
@@ -63,21 +60,23 @@ class login:
             self.master.destroy()
             self.abrir_principal()
         else:
-            self.msg["text"] = "Usuário e/ou senha incorretos"
+            messagebox.showerror("", "O usuario e/ou a senha estão incorretos")
 
     def abrir_principal(self):
         app = Home(master= root)
         app.run()
 
     def abrir_cadastro(self):
-        self.master.destroy() 
-        app = cadastro(master= Tk())
+        self.master.destroy()
+        root = Tk()
+        root.state('zoomed') 
+        app = cadastro(master= root)
 
 if __name__ == "__main__":
     root = Tk()
     root.title("Login")
     root.geometry("300x250")
-    root.geometry("+500+210")
+    root.geometry("+530+200")
     root.resizable(False, False)
     login(root)
     root.mainloop()

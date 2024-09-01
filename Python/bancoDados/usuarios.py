@@ -90,39 +90,44 @@ class cadastro:
         self.botExcluir.pack(side = LEFT)
 
         self.botLimpar = Button(self.setimoContainer, text = "Limpar", width = 12)
-        self.botLimpar["command"] = self.Limpar
+        self.botLimpar["command"] = self.limpar
         self.botLimpar.pack(side = LEFT)
 
         self.tree = self.createTreeView(master)
 
-    def Limpar(self):
-        self.entID.delete(0, END)
-        self.entNome.delete(0, END)
-        self.entTelefone.delete(0, END)
-        self.entEmail.delete(0, END)
-        self.entUsuario.delete(0, END)
-        self.entSenha.delete(0, END)
+    def limpar(self):
 
-        messagebox.showinfo("Limpar", "Campos limpos")
+        if self.entID.get() or self.entNome.get() or self.entTelefone.get() or self.entEmail.get() or self.entUsuario.get() or self.entSenha.get():
+            self.entID.delete(0, END)
+            self.entNome.delete(0, END)
+            self.entTelefone.delete(0, END)
+            self.entEmail.delete(0, END)
+            self.entUsuario.delete(0, END)
+            self.entSenha.delete(0, END)
+            messagebox.showinfo("", "Campos limpos")
 
     def inserirUsuario(self):
         user = usuarios()
 
-        user.nome = self.entNome.get()
-        user.telefone = self.entTelefone.get()
-        user.email = self.entEmail.get()
-        user.usuario = self.entUsuario.get()
-        user.senha = self.entSenha.get()
+        if self.entNome.get() and self.entTelefone.get() and self.entEmail.get() and self.entUsuario.get() and self.entSenha.get():
 
-        self.entID.delete(0, END)
-        self.entNome.delete(0, END)
-        self.entTelefone.delete(0, END)
-        self.entEmail.delete(0, END)
-        self.entUsuario.delete(0, END)
-        self.entSenha.delete(0, END)
+            user.nome = self.entNome.get()
+            user.telefone = self.entTelefone.get()
+            user.email = self.entEmail.get()
+            user.usuario = self.entUsuario.get()
+            user.senha = self.entSenha.get()
 
-        result = user.insertUser()
-        messagebox.showinfo("Inserir", result)
+            self.entID.delete(0, END)
+            self.entNome.delete(0, END)
+            self.entTelefone.delete(0, END)
+            self.entEmail.delete(0, END)
+            self.entUsuario.delete(0, END)
+            self.entSenha.delete(0, END)
+
+            result = user.insertUser()
+            messagebox.showinfo("Inserir", result)
+        else:
+            messagebox.showwarning("Aviso", "Preencha todos os campos")
 
         self.atualizarTreeView()
 

@@ -66,24 +66,28 @@ class cidades:
         self.tree = self.createTreeView(master)
 
     def limpar(self):
-        c = cid()
-        self.entID.delete(0, END)
-        self.entNome.delete(0, END)
-        self.entEstado.delete(0, END)
 
-        messagebox.showinfo("","Campos Limpos")
+        if self.entID.get() or self.entNome.get() or self.entNome.get() or self.entEstado.get():
+            self.entID.delete(0, END)
+            self.entNome.delete(0, END)
+            self.entEstado.delete(0, END)
+            messagebox.showinfo("","Campos Limpos")
 
     def cadastrarCidade(self):
         c = cid()
         
-        c.cidade = self.entNome.get()
-        c.estado = self.entEstado.get()
+        if self.entNome.get() and self.entEstado.get():
+            c.cidade = self.entNome.get()
+            c.estado = self.entEstado.get()
 
-        self.entNome.delete(0, END)
-        self.entEstado.delete(0, END)
+            self.entNome.delete(0, END)
+            self.entEstado.delete(0, END)
 
-        result = c.cadastrarCidade()
-        messagebox.showinfo("Cadastro", result)
+            result = c.cadastrarCidade()
+            messagebox.showinfo("Cadastro", result)
+        
+        else:
+            messagebox.showwarning("Aviso", "Preencha todos os campos")
 
 
         self.atualizarTreeView()

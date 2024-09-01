@@ -103,42 +103,48 @@ class appClientes:
         self.botExcluir.pack(side = LEFT)
 
         self.botLimpar = Button(self.setimoContainer, text = "Limpar", width = 12)
-        self.botLimpar["command"] = self.Limpar
+        self.botLimpar["command"] = self.limpar
         self.botLimpar.pack(side = LEFT)
 
         self.tree = self.createTreeView(master)
 
-    def Limpar(self):
-        self.entID.delete(0, END)
-        self.entNome.delete(0, END)
-        self.entTelefone.delete(0, END)
-        self.entEmail.delete(0, END)
-        self.entEndereco.delete(0, END)
-        self.entCpf.delete(0, END)
-        self.combo.delete(0, END)
+    def limpar(self):
+        
+        if self.entID.get() or self.entNome.get() or self.entTelefone.get() or self.entEmail.get() or self.entEndereco.get() or self.entCpf.get() or self.combo.get():
+            self.entID.delete(0, END)
+            self.entNome.delete(0, END)
+            self.entTelefone.delete(0, END)
+            self.entEmail.delete(0, END)
+            self.entEndereco.delete(0, END)
+            self.entCpf.delete(0, END)
+            self.combo.delete(0, END)
 
-        messagebox.showinfo("Limpeza", "Campos Limpos")
+            messagebox.showinfo("", "Campos Limpos")
+    
 
     def inserirCliente(self):
         cli = cliente()
 
-        cli.nome = self.entNome.get()
-        cli.telefone = self.entTelefone.get()
-        cli.email = self.entEmail.get()
-        cli.endereco = self.entEndereco.get()
-        cli.cpf = self.entCpf.get()
-        cli.cidade = self.combo.get()
+        if self.entNome.get() and self.entTelefone.get() and self.entEmail.get() and self.entEndereco.get() and self.entCpf.get() and self.combo.get():
+            cli.nome = self.entNome.get()
+            cli.telefone = self.entTelefone.get()
+            cli.email = self.entEmail.get()
+            cli.endereco = self.entEndereco.get()
+            cli.cpf = self.entCpf.get()
+            cli.cidade = self.combo.get()
 
-        self.entID.delete(0, END)
-        self.entNome.delete(0, END)
-        self.entTelefone.delete(0, END)
-        self.entEmail.delete(0, END)
-        self.entEndereco.delete(0, END)
-        self.entCpf.delete(0, END)
-        self.combo.delete(0, END)
+            self.entID.delete(0, END)
+            self.entNome.delete(0, END)
+            self.entTelefone.delete(0, END)
+            self.entEmail.delete(0, END)
+            self.entEndereco.delete(0, END)
+            self.entCpf.delete(0, END)
+            self.combo.delete(0, END)
 
-        result = cli.insertCliente()
-        messagebox.showinfo("Inserir", result)
+            result = cli.insertCliente()
+            messagebox.showinfo("Inserir", result)
+        else:
+            messagebox.showwarning("Aviso", "Preencha todos os campos")
 
         self.atualizarTreeView()
 

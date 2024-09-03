@@ -151,24 +151,27 @@ class appClientes:
     def alterarCliente(self):
         cli = cliente()
 
-        cli.id = self.entID.get()
-        cli.nome = self.entNome.get()
-        cli.telefone = self.entTelefone.get()
-        cli.email = self.entEmail.get()
-        cli.endereco = self.entEndereco.get()
-        cli.cpf = self.entCpf.get()
-        cli.cidade = self.combo.get()
+        if self.entID.get() and self.entNome.get() and self.entTelefone.get() and self.entEmail.get() and self.entEndereco.get() and self.entCpf.get() and self.combo.get():
+            cli.id = self.entID.get()
+            cli.nome = self.entNome.get()
+            cli.telefone = self.entTelefone.get()
+            cli.email = self.entEmail.get()
+            cli.endereco = self.entEndereco.get()
+            cli.cpf = self.entCpf.get()
+            cli.cidade = self.combo.get()
 
-        self.entID.delete(0, END)
-        self.entNome.delete(0, END)
-        self.entTelefone.delete(0, END)
-        self.entEmail.delete(0, END)
-        self.entEndereco.delete(0, END)
-        self.entCpf.delete(0, END)
-        self.combo.delete(0, END)
+            self.entID.delete(0, END)
+            self.entNome.delete(0, END)
+            self.entTelefone.delete(0, END)
+            self.entEmail.delete(0, END)
+            self.entEndereco.delete(0, END)
+            self.entCpf.delete(0, END)
+            self.combo.delete(0, END)
 
-        result = cli.updateCliente()
-        messagebox.showinfo("Alterar", result)
+            result = cli.updateCliente()
+            messagebox.showinfo("Alterar", result)
+        else:
+            messagebox.showwarning("Aviso", "Preencha todos os campos")
         
         self.atualizarTreeView()
 
@@ -177,16 +180,19 @@ class appClientes:
 
         cli.id = self.entID.get()
 
-        result = cli.deleteCliente()
-        messagebox.showinfo("Deletar", result)
+        if self.entID.get():
+            result = cli.deleteCliente()
+            messagebox.showinfo("Deletar", result)
 
-        self.entID.delete(0, END)
-        self.entNome.delete(0, END)
-        self.entTelefone.delete(0, END)
-        self.entEmail.delete(0, END)
-        self.entEndereco.delete(0, END)
-        self.entCpf.delete(0, END)
-        self.combo.delete(0, END)
+            self.entID.delete(0, END)
+            self.entNome.delete(0, END)
+            self.entTelefone.delete(0, END)
+            self.entEmail.delete(0, END)
+            self.entEndereco.delete(0, END)
+            self.entCpf.delete(0, END)
+            self.combo.delete(0, END)
+        else:
+            messagebox.showwarning("Aviso", "Selecione um ID para a exclusão")
         
         self.atualizarTreeView()
 
@@ -195,29 +201,32 @@ class appClientes:
 
         cli.id = self.entID.get()
 
-        result = cli.selectCliente()
-        messagebox.showinfo("Busca", result)
+        if self.entID.get():
+            result = cli.selectCliente()
+            messagebox.showinfo("Busca", result)
 
-        self.entID.delete(0, END)
-        self.entID.insert(INSERT, cli.id)
+            self.entID.delete(0, END)
+            self.entID.insert(INSERT, cli.id)
 
-        self.entNome.delete(0, END)
-        self.entNome.insert(INSERT, cli.nome)
+            self.entNome.delete(0, END)
+            self.entNome.insert(INSERT, cli.nome)
 
-        self.entTelefone.delete(0, END)
-        self.entTelefone.insert(INSERT,cli.telefone)
+            self.entTelefone.delete(0, END)
+            self.entTelefone.insert(INSERT,cli.telefone)
 
-        self.entEmail.delete(0, END)
-        self.entEmail.insert(INSERT, cli.email)
+            self.entEmail.delete(0, END)
+            self.entEmail.insert(INSERT, cli.email)
 
-        self.entEndereco.delete(0, END)
-        self.entEndereco.insert(INSERT, cli.endereco)
+            self.entEndereco.delete(0, END)
+            self.entEndereco.insert(INSERT, cli.endereco)
 
-        self.entCpf.delete(0, END)
-        self.entCpf.insert(INSERT, cli.cpf)
+            self.entCpf.delete(0, END)
+            self.entCpf.insert(INSERT, cli.cpf)
 
-        self.combo.delete(0, END)
-        self.combo.insert(INSERT, cli.cidade)
+            self.combo.delete(0, END)
+            self.combo.insert(INSERT, cli.cidade)
+        else:
+            messagebox.showwarning("Aviso", "Selecione um ID para a busca")
 
 
     def createTreeView(self, root):

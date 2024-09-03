@@ -75,6 +75,7 @@ class cadastro:
         self.txtSenha.pack(side = LEFT)
         self.entSenha = Entry(self.sextoContainer)
         self.entSenha["width"] = 25
+        self.entSenha["show"] = "*"
         self.entSenha.pack()
 
         self.botInsert = Button(self.setimoContainer,text="Inserir", width = 12)
@@ -134,22 +135,25 @@ class cadastro:
     def alterarUsuario(self):
         user = usuarios()
 
-        user.id = self.entID.get()
-        user.nome = self.entNome.get()
-        user.telefone = self.entTelefone.get()
-        user.email = self.entEmail.get()
-        user.usuario = self.entUsuario.get()
-        user.senha = self.entSenha.get()
+        if self.entID.get() and self.entNome.get() and self.entTelefone.get() and self.entEmail.get() and self.entUsuario.get() and self.entSenha.get():
+            user.id = self.entID.get()
+            user.nome = self.entNome.get()
+            user.telefone = self.entTelefone.get()
+            user.email = self.entEmail.get()
+            user.usuario = self.entUsuario.get()
+            user.senha = self.entSenha.get()
 
-        self.entID.delete(0, END)
-        self.entNome.delete(0, END)
-        self.entTelefone.delete(0, END)
-        self.entEmail.delete(0, END)
-        self.entUsuario.delete(0, END)
-        self.entSenha.delete(0, END)
+            self.entID.delete(0, END)
+            self.entNome.delete(0, END)
+            self.entTelefone.delete(0, END)
+            self.entEmail.delete(0, END)
+            self.entUsuario.delete(0, END)
+            self.entSenha.delete(0, END)
         
-        result = user.updateUser()
-        messagebox.showinfo("Alterar", result)
+            result = user.updateUser()
+            messagebox.showinfo("Alterar", result)
+        else:
+            messagebox.showwarning("Aviso", "Preencha todos os campos")
 
         self.atualizarTreeView()
 
@@ -158,15 +162,18 @@ class cadastro:
 
         user.id = self.entID.get()
 
-        result = user.deleteUser()
-        messagebox.showinfo("Excluir", result)
+        if self.entID.get():
+            result = user.deleteUser()
+            messagebox.showinfo("Excluir", result)
 
-        self.entID.delete(0, END)
-        self.entNome.delete(0, END)
-        self.entTelefone.delete(0, END)
-        self.entEmail.delete(0, END)
-        self.entUsuario.delete(0, END)
-        self.entSenha.delete(0, END)
+            self.entID.delete(0, END)
+            self.entNome.delete(0, END)
+            self.entTelefone.delete(0, END)
+            self.entEmail.delete(0, END)
+            self.entUsuario.delete(0, END)
+            self.entSenha.delete(0, END)
+        else:
+            messagebox.showwarning("Aviso", "Selecione um ID para a exclusão")
         
         self.atualizarTreeView()
 
@@ -175,26 +182,29 @@ class cadastro:
 
         user.id = self.entID.get()
 
-        result = user.selectUser()
-        messagebox.showinfo("Busca", result)
+        if self.entID.get():
+            result = user.selectUser()
+            messagebox.showinfo("Busca", result)
 
-        self.entID.delete(0, END)
-        self.entID.insert(INSERT, user.id)
+            self.entID.delete(0, END)
+            self.entID.insert(INSERT, user.id)
 
-        self.entNome.delete(0, END)
-        self.entNome.insert(INSERT, user.nome)
+            self.entNome.delete(0, END)
+            self.entNome.insert(INSERT, user.nome)
 
-        self.entTelefone.delete(0, END)
-        self.entTelefone.insert(INSERT,user.telefone)
+            self.entTelefone.delete(0, END)
+            self.entTelefone.insert(INSERT,user.telefone)
 
-        self.entEmail.delete(0, END)
-        self.entEmail.insert(INSERT, user.email)
+            self.entEmail.delete(0, END)
+            self.entEmail.insert(INSERT, user.email)
 
-        self.entUsuario.delete(0, END)
-        self.entUsuario.insert(INSERT, user.usuario)
+            self.entUsuario.delete(0, END)
+            self.entUsuario.insert(INSERT, user.usuario)
 
-        self.entSenha.delete(0, END)
-        self.entSenha.insert(INSERT,user.senha)
+            self.entSenha.delete(0, END)
+            self.entSenha.insert(INSERT,user.senha)
+        else:
+            messagebox.showwarning("Aviso", "Selecione um ID para a busca")
 
 
     def createTreeView(self, root):

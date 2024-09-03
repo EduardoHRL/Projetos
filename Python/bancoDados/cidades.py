@@ -94,17 +94,20 @@ class cidades:
 
     def alterarCidade(self):
         c = cid()
- 
-        c.id = self.entID.get()
-        c.cidade = self.entNome.get()
-        c.estado = self.entEstado.get()
 
-        self.entID.delete(0, END)
-        self.entNome.delete(0, END)
-        self.entEstado.delete(0, END)
+        if self.entID.get() and self.entNome.get() and self.entEstado.get():
+            c.id = self.entID.get()
+            c.cidade = self.entNome.get()
+            c.estado = self.entEstado.get()
 
-        result = c.updateCidade()
-        messagebox.showinfo("Alteração", result)
+            self.entID.delete(0, END)
+            self.entNome.delete(0, END)
+            self.entEstado.delete(0, END)
+
+            result = c.updateCidade()
+            messagebox.showinfo("Alteração", result)
+        else:
+            messagebox.showwarning("Aviso", "Preencha todos os campos")
 
         self.atualizarTreeView()
 
@@ -113,12 +116,15 @@ class cidades:
 
         c.id = self.entID.get()
         
-        self.entID.delete(0, END)
-        self.entNome.delete(0, END)
-        self.entEstado.delete(0, END)
+        if self.entID.get():
+            self.entID.delete(0, END)
+            self.entNome.delete(0, END)
+            self.entEstado.delete(0, END)
 
-        result = c.deleteCidade()
-        messagebox.showinfo("Deletar", result)
+            result = c.deleteCidade()
+            messagebox.showinfo("Deletar", result)
+        else:
+            messagebox.showwarning("Aviso", "Selecione um ID para a exclusão")
 
         self.atualizarTreeView()
 
@@ -127,17 +133,20 @@ class cidades:
 
         c.id = self.entID.get()
 
-        result = c.buscarCidade()
-        messagebox.showinfo("Buscar", result)
+        if self.entID.get():
+            result = c.buscarCidade()
+            messagebox.showinfo("Buscar", result)
 
-        self.entID.delete(0, END)
-        self.entID.insert(INSERT, c.id)
+            self.entID.delete(0, END)
+            self.entID.insert(INSERT, c.id)
 
-        self.entNome.delete(0, END)
-        self.entNome.insert(INSERT, c.cidade)
+            self.entNome.delete(0, END)
+            self.entNome.insert(INSERT, c.cidade)
 
-        self.entEstado.delete(0, END)
-        self.entEstado.insert(INSERT, c.estado)
+            self.entEstado.delete(0, END)
+            self.entEstado.insert(INSERT, c.estado)
+        else:
+            messagebox.showwarning("Aviso", "Selecione um ID para a busca")
 
         
     def createTreeView(self, root):

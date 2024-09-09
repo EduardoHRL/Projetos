@@ -1,5 +1,0 @@
-[wokwi]
-version=1
-firmware = 'C:\Users\SENAI\Documents\GitHub\Projetos-Senai\Esp32\arduino-lcd-helloworld-main.hex'
-elf = 'C:\Users\SENAI\Documents\GitHub\Projetos-Senai\Esp32\arduino-lcd-helloworld-main.elf'
-gdbServerPort=3333

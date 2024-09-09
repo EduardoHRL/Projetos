@@ -1,5 +1,0 @@
-{
-    "sketch": "arduino-lcd-helloworld.ino",
-    "output": "build",
-    "board": "arduino:avr:uno"
-}

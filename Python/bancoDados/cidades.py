@@ -1,7 +1,10 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 from insertCidades import *
+import os
 
 class cidades:
     def __init__(self, master = None):
@@ -62,6 +65,9 @@ class cidades:
         self.botaoLimpar = Button(self.container04, text = "Limpar", width = 12)
         self.botaoLimpar["command"] = self.limpar
         self.botaoLimpar.pack(side = LEFT)
+
+        self.botaoPdf = Button(self.container04, text = "PDF", command = self.criarPdf, width = 12)
+        self.botaoPdf.pack(side = LEFT)
 
         self.tree = self.createTreeView(master)
 
@@ -147,7 +153,42 @@ class cidades:
             self.entEstado.insert(INSERT, c.estado)
         else:
             messagebox.showwarning("Aviso", "Selecione um ID para a busca")
+    def criarPdf(self):
+        cidade = cid()
+        dados = cidade.buscarTreeView()
+        
+        c = canvas.Canvas("conteudo_cidades.pdf", pagesize=letter)
+        path = "conteudo_cidades.pdf"
 
+        largura, altura = letter
+        c.setFont("Helvetica", 10)
+        
+        x = 100
+        y = altura - 50
+
+        c.drawString(x, y, "ID")
+        c.drawString(x + 50, y, "Cidade")
+        c.drawString(x + 150, y, "Estado")
+
+        y -= 20 
+
+        for linha in dados:
+            c.drawString(x, y, str(linha[0]))
+            c.drawString(x + 50, y, str(linha[1])) 
+            c.drawString(x + 150, y, str(linha[2]))
+            y -= 15
+
+            if y < 50:
+                c.showPage()
+                c.setFont("Helvetica", 10)
+                y = altura - 50
+                c.drawString(x, y, "ID")
+                c.drawString(x + 50, y, "Cidade")
+                c.drawString(x + 150, y, "Estado")
+                y -= 20
+
+        c.save()
+        os.startfile(path)
         
     def createTreeView(self, root):
         c = cid()

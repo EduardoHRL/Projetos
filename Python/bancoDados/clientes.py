@@ -1,7 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import os
 from insertClientes import *
 
 
@@ -105,6 +107,9 @@ class appClientes:
         self.botLimpar = Button(self.setimoContainer, text = "Limpar", width = 12)
         self.botLimpar["command"] = self.limpar
         self.botLimpar.pack(side = LEFT)
+
+        self.botPdf = Button(self.setimoContainer, text = "PDF", width = 12, command = self.criarPdf)
+        self.botPdf.pack(side = LEFT)
 
         self.tree = self.createTreeView(master)
 
@@ -227,6 +232,54 @@ class appClientes:
             self.combo.insert(INSERT, cli.cidade)
         else:
             messagebox.showwarning("Aviso", "Selecione um ID para a busca")
+        
+    def criarPdf(self):
+        cli = cliente()
+        dados = cli.buscarTreeView()
+        
+        c = canvas.Canvas("conteudo_clientes.pdf", pagesize=letter)
+        path = "conteudo_clientes.pdf"
+
+        largura, altura = letter
+        c.setFont("Helvetica", 10)
+        
+        x = 100
+        y = altura - 50
+
+        c.drawString(x, y, "ID")
+        c.drawString(x + 50, y, "Nome")
+        c.drawString(x + 150, y, "Telefone")
+        c.drawString(x + 230, y, "Email")
+        c.drawString(x + 350, y, "Endereço")
+        c.drawString(x + 450, y, "CPF")
+        c.drawString(x + 550, y, "Cidade")
+
+        y -= 20 
+
+        for linha in dados:
+            c.drawString(x, y, str(linha[0]))
+            c.drawString(x + 50, y, str(linha[1])) 
+            c.drawString(x + 150, y, str(linha[2]))
+            c.drawString(x + 230, y, str(linha[3]))
+            c.drawString(x + 350, y, str(linha[4]))
+            c.drawString(x + 450, y, str(linha[5]))
+            c.drawString(x + 550, y, str(linha[6]))
+            y -= 15
+
+            if y < 50:
+                c.showPage()
+                c.setFont("Helvetica", 10)
+                y = altura - 50
+                c.drawString(x, y, "ID")
+                c.drawString(x + 50, y, "Nome")
+                c.drawString(x + 150, y, "Telefone")
+                c.drawString(x + 230, y, "Email")
+                c.drawString(x + 350, y, "Endereço")
+                c.drawString(x + 450, y, "CPF")
+                c.drawString(x + 550, y, "Cidade")
+                y -= 20
+        c.save()
+        os.startfile(path)
 
 
     def createTreeView(self, root):

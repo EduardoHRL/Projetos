@@ -82,4 +82,3 @@ class cid(object):
         c.close()
         
         return rows
-

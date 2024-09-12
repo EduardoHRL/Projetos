@@ -3,6 +3,7 @@ import sqlite3
 class banco():
     def __init__(self):
         self.conexao = sqlite3.connect('banco.db')
+        self.conexao.execute("PRAGMA foreign_keys = ON")
         self.createTable()
     
     def createTable(self):
@@ -30,7 +31,7 @@ class banco():
                   endereco text,
                     cpf text,
                   cidade integer,
-                  FOREIGN KEY (id) REFERENCES cidades(id)
+                  FOREIGN KEY (id) REFERENCES cidades(id) ON DELETE RESTRICT
                   )""")
       
         self.conexao.commit()

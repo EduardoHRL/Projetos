@@ -34,17 +34,14 @@ class Home:
         def abrirUsuarios():
             clear_frame()
             app = cadastro(master=self.container)
-            app.pack(fill=BOTH, expand=True)
-
+            
         def abrirCidades():
             clear_frame()
             app = cidades(master=self.container)
-            app.pack(fill=BOTH, expand=True)
 
         def abrirClientes():
             clear_frame()
             app = appClientes(master=self.container)
-            app.pack(fill=BOTH, expand=True)
 
         def Open():
             filedialog.askopenfilename()

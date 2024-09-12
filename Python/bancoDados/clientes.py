@@ -89,7 +89,7 @@ class appClientes:
         self.txtCidade = Label(self.containerComboBox, text = "Cidade:", font = self.fontePadrao, width = 10)
         self.txtCidade.pack(side = LEFT)
 
-        self.combo = ttk.Combobox(self.containerComboBox, values=self.buscarCombo(), state='normal')
+        self.combo = ttk.Combobox(self.containerComboBox, values=self.buscarCombo(), state = 'normal')
         self.combo.pack(side = LEFT)
 
         self.botInsert = Button(self.setimoContainer,text="Inserir", width = 12)

@@ -9,14 +9,18 @@ const char *supabaseApiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzd
 
 
 DHT11 dht(26);
-
+const int RelePin = 4;
 const int sensorUmidade = 34;
+const int limiarSeco = 50;
 
 void setup() {
   Serial.begin(115200);
   WiFi.begin(ssid, password);
   
   pinMode(sensorUmidade, INPUT);
+  pinMode(RelePin, OUTPUT);
+  digitalWrite(RelePin, LOW);
+
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
@@ -29,12 +33,11 @@ void loop() {
   int temperatura = 0;
   int umidade = 0;
 
-  // Attempt to read the temperature and humidity values from the DHT11 sensor.
   int result = dht.readTemperatureHumidity(temperatura, umidade);
 
   
   int leitura = analogRead(sensorUmidade);
-
+  leitura = map(leitura, 4095, 0, 0, 100);
 
     if (WiFi.status() == WL_CONNECTED) {
       HTTPClient http;
@@ -61,6 +64,12 @@ void loop() {
       }
       http.end();
     }
+    if (leitura < limiarSeco) {
+      digitalWrite(RelePin, LOW);
+    }else{
+      digitalWrite(RelePin, HIGH);
+  }
+
 
     delay(1000);
   

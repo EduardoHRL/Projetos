@@ -2,8 +2,8 @@
 #include <HTTPClient.h>
 #include <DHT11.h>
 
-const char *ssid = "Uaifai";
-const char *password = "Cida@vicente07";
+const char *ssid = "Casa";
+const char *password = "nildapereira";
 const char *supabaseUrl = "https://vkrlyyyvattgjcwimumr.supabase.co";
 const char *supabaseApiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrcmx5eXl2YXR0Z2pjd2ltdW1yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjE4NDU5MTEsImV4cCI6MjAzNzQyMTkxMX0.RQYD0a8Z3jBXCsuglOSgGMbhisZEgtOVSdHDeTabCIk";
 
@@ -27,6 +27,8 @@ void setup() {
     Serial.println("Conectando ao WiFi...");
   }
   Serial.println("Conectado ao WiFi");
+  Serial.print("IP do ESP32: ");
+  Serial.println(WiFi.localIP());
 }
 
 void loop() {

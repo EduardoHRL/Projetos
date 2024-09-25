@@ -2,12 +2,15 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <DHT11.h>
-#include <WebServer.h>  // Biblioteca do servidor web
+#include <WebServer.h>
+#include <WiFi.h>
+#include <NTPClient.h>
+#include <WiFiUdp.h>
 
 const char *ssid = "Casa";
 const char *password = "nildapereira";
 const char *supabaseUrl = "https://vkrlyyyvattgjcwimumr.supabase.co";
-const char *supabaseApiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInZrcmx5eXl2YXR0Z2pjd2ltdW1yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjE4NDU5MTEsImV4cCI6MjAzNzQyMTkxMX0.RQYD0a8Z3jBXCsuglOSgGMbhisZEgtOVSdHDeTabCIk";
+const char *supabaseApiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrcmx5eXl2YXR0Z2pjd2ltdW1yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjE4NDU5MTEsImV4cCI6MjAzNzQyMTkxMX0.RQYD0a8Z3jBXCsuglOSgGMbhisZEgtOVSdHDeTabCIk";
 
 DHT11 dht(26);
 const int RelePin = 4;
@@ -15,11 +18,16 @@ const int sensorUmidade = 34;
 const int limiarSeco = 50;
 bool controleManual = false;
 
-WebServer server(80);  // Instância do servidor na porta 80
+WebServer server(80);
+
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "pool.ntp.org", -3 * 3600);
 
 void setup() {
   Serial.begin(115200);
   WiFi.begin(ssid, password);
+
+
 
   pinMode(sensorUmidade, INPUT);
   pinMode(RelePin, OUTPUT);
@@ -29,22 +37,27 @@ void setup() {
     delay(1000);
     Serial.println("Conectando ao WiFi...");
   }
+
+  timeClient.begin();
+
   Serial.println("Conectado ao WiFi");
   Serial.print("IP do ESP32: ");
   Serial.println(WiFi.localIP());
 
-  // Configurações do servidor HTTP
-  server.on("/rele/on", ligarRele);                      // Rota para ligar o relé
-  server.on("/rele/off", desligarRele);                  // Rota para desligar o relé
-  server.on("/get_sensores", getSensores);               // Rota para obter os dados dos sensores
-  server.on("/set_controle_manual", setControleManual);  // Rota para habilitar/desabilitar controle manual
+  server.on("/rele/on", ligarRele);
+  server.on("/rele/off", desligarRele);
+  server.on("/get_sensores", getSensores);
+  server.on("/set_controle_manual", setControleManual);
 
   server.begin();  // Inicia o servidor
   Serial.println("Servidor HTTP iniciado");
 }
 
 void loop() {
-  server.handleClient();  // Processa as requisições HTTP
+  server.handleClient();
+  timeClient.update();
+
+  String Data = timeClient.getFormattedTime();
 
   int temperatura = 0;
   int umidade = 0;
@@ -56,8 +69,9 @@ void loop() {
     HTTPClient http;
     String jsonPayload = "{";
     jsonPayload += "\"umidade_solo\":" + String(leitura) + ",";
+    jsonPayload += "\"umidade_ar\":" + String(umidade) + ",";
     jsonPayload += "\"temperatura\":" + String(temperatura) + ",";
-    jsonPayload += "\"umidade_ar\":" + String(umidade);
+    jsonPayload += "\"horario\":\"" + Data + "\"";
     jsonPayload += "}";
 
     String url = String(supabaseUrl) + "/rest/v1/sensor_data";
@@ -77,8 +91,7 @@ void loop() {
     http.end();
   }
 
-  // Controle automático do relé
-  if (!controleManual) {  // Só controla automaticamente se o modo manual não estiver ativado
+  if (!controleManual) {
     if (leitura < limiarSeco) {
       digitalWrite(RelePin, LOW);  // Liga o relé
     } else {
@@ -86,10 +99,9 @@ void loop() {
     }
   }
 
-  delay(1000);  // Intervalo de 1 segundo entre leituras
+  delay(60000);
 }
 
-// Função para ligar o relé via HTTP
 void ligarRele() {
   controleManual = true;       // Ativa o controle manual
   digitalWrite(RelePin, LOW);  // Liga o relé
@@ -97,7 +109,6 @@ void ligarRele() {
   Serial.println("Relé ligado via HTTP");
 }
 
-// Função para desligar o relé via HTTP
 void desligarRele() {
   controleManual = true;        // Ativa o controle manual
   digitalWrite(RelePin, HIGH);  // Desliga o relé
@@ -105,7 +116,6 @@ void desligarRele() {
   Serial.println("Relé desligado via HTTP");
 }
 
-// Função para retornar dados dos sensores via HTTP
 void getSensores() {
   int temperatura = 0;
   int umidade = 0;
@@ -114,16 +124,15 @@ void getSensores() {
   leitura = map(leitura, 4095, 0, 0, 100);
 
   String jsonResponse = "{";
-  jsonResponse += "\"temperatura\":" + String(temperatura) + ",";
+  jsonResponse += "\"umidade_solo\":" + String(leitura) + ",";
   jsonResponse += "\"umidade_ar\":" + String(umidade) + ",";
-  jsonResponse += "\"umidade_solo\":" + String(leitura);
+  jsonResponse += "\"temperatura\":" + String(temperatura);
   jsonResponse += "}";
 
   server.send(200, "application/json", jsonResponse);
   Serial.println("Dados dos sensores enviados via HTTP");
 }
 
-// Função para ativar ou desativar o controle manual via HTTP
 void setControleManual() {
   if (server.hasArg("manual")) {
     String modo = server.arg("manual");

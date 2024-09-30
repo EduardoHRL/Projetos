@@ -57,7 +57,12 @@ void loop() {
   server.handleClient();
   timeClient.update();
 
-  String Data = timeClient.getFormattedTime();
+  time_t rawtime = timeClient.getEpochTime();
+  struct tm *timeinfo = gmtime(&rawtime);
+  char buffer[25];
+  strftime(buffer, sizeof(buffer), "%Y-%m-%dT%H:%M:%SZ", timeinfo);
+  
+  String Data = String(buffer);
 
   int temperatura = 0;
   int umidade = 0;

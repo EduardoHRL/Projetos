@@ -7,8 +7,8 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
-const char *ssid = "Casa";
-const char *password = "nildapereira";
+const char *ssid = "caba";
+const char *password = "doce3200@";
 const char *supabaseUrl = "https://vkrlyyyvattgjcwimumr.supabase.co";
 const char *supabaseApiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrcmx5eXl2YXR0Z2pjd2ltdW1yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjE4NDU5MTEsImV4cCI6MjAzNzQyMTkxMX0.RQYD0a8Z3jBXCsuglOSgGMbhisZEgtOVSdHDeTabCIk";
 

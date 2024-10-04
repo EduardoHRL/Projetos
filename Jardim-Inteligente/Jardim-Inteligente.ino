@@ -49,7 +49,7 @@ void setup() {
   server.on("/get_sensores", getSensores);
   server.on("/set_controle_manual", setControleManual);
 
-  server.begin();  // Inicia o servidor
+  server.begin();
   Serial.println("Servidor HTTP iniciado");
 }
 
@@ -108,15 +108,15 @@ void loop() {
 }
 
 void ligarRele() {
-  controleManual = true;       // Ativa o controle manual
-  digitalWrite(RelePin, LOW);  // Liga o relé
+  controleManual = true;
+  digitalWrite(RelePin, LOW);
   server.send(200, "text/plain", "Relé ligado");
   Serial.println("Relé ligado via HTTP");
 }
 
 void desligarRele() {
-  controleManual = true;        // Ativa o controle manual
-  digitalWrite(RelePin, HIGH);  // Desliga o relé
+  controleManual = true;
+  digitalWrite(RelePin, HIGH);
   server.send(200, "text/plain", "Relé desligado");
   Serial.println("Relé desligado via HTTP");
 }

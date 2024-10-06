@@ -10,7 +10,7 @@ from datetime import datetime
 from tkcalendar import DateEntry
 import sys
 
-esp32_ip = "http://192.168.200.44"
+esp32_ip = "http://192.168.100.200"
 
 
 def ligar_irrigacao():
@@ -40,17 +40,11 @@ def atualizar_dados():
         response = requests.get(f"{esp32_ip}/get_sensores")
         if response.status_code == 200:
             dados = response.json()
-            temperatura_label.configure(text=f"Temperatura: {dados['temperatura']}°C")
             umidade_solo_label.configure(text=f"Umidade do Solo: {dados['umidade_solo']}%")
-            umidade_ar_label.configure(text=f"Umidade do Ar: {dados['umidade_ar']}%")
         else:
-            temperatura_label.configure(text="Erro ao obter temperatura")
             umidade_solo_label.configure(text="Erro ao obter umidade do solo")
-            umidade_ar_label.configure(text="Erro ao obter umidade do ar")
     except:
-        temperatura_label.configure(text=f"Erro ao obter temperatura")
         umidade_solo_label.configure(text=f"Erro ao obter umidade do solo")
-        umidade_ar_label.configure(text=f"Erro ao obter umidade do ar")
 
 def ligar_irrigacao_automatica():
     try:
@@ -88,16 +82,11 @@ def gerar_grafico_por_data(parent, data_selecionada, canvas_frame):
         return
 
     horarios = [datetime.strptime(dado['horario'], '%Y-%m-%dT%H:%M:%S') for dado in dados_filtrados]
-    temperaturas = [dado['temperatura'] for dado in dados_filtrados]
     umidades_solo = [dado['umidade_solo'] for dado in dados_filtrados]
-    umidades_ar = [dado['umidade_ar'] for dado in dados_filtrados]
 
     fig, ax = plt.subplots(figsize=(8, 6))
 
-    # Plotando as informações filtradas
-    ax.plot(horarios, temperaturas, label='Temperatura (°C)', color='red', marker='o')
     ax.plot(horarios, umidades_solo, label='Umidade do Solo (%)', color='blue', marker='o')
-    ax.plot(horarios, umidades_ar, label='Umidade do Ar (%)', color='green', marker='o')
 
     ax.set_xlabel('Hora')
     ax.set_ylabel('Valores')
@@ -105,14 +94,12 @@ def gerar_grafico_por_data(parent, data_selecionada, canvas_frame):
     ax.legend()
     ax.grid(True)
 
-    # Configurando o eixo X
     ax.xaxis.set_major_locator(mdates.HourLocator(interval=1))
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
 
     fig.tight_layout()
 
-    # Exibir o gráfico no tkinter
     canvas = FigureCanvasTkAgg(fig, master=canvas_frame)
     canvas.draw()
     canvas.get_tk_widget().pack(fill=BOTH, expand=True)
@@ -167,14 +154,8 @@ abaSensores = aba1.add("Dados dos Sensores")
 atualizar_button = ctk.CTkButton(abaSensores, text="Atualizar Dados", command=atualizar_dados)
 atualizar_button.pack(pady=10)
 
-temperatura_label = ctk.CTkLabel(abaSensores, text="Temperatura: --°C")
-temperatura_label.pack(pady=5)
-
 umidade_solo_label = ctk.CTkLabel(abaSensores, text="Umidade do Solo: --%")
 umidade_solo_label.pack(pady=5)
-
-umidade_ar_label = ctk.CTkLabel(abaSensores, text="Umidade do Ar: --%")
-umidade_ar_label.pack(pady=5)
 
 abaDados = aba1.add("Dados por Hora")
 grafico(abaDados)

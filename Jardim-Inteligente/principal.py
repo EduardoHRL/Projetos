@@ -10,7 +10,7 @@ from datetime import datetime
 from tkcalendar import DateEntry
 import sys
 
-esp32_ip = "http://192.168.100.200"
+esp32_ip = "http://192.168.92.44"
 
 
 def ligar_irrigacao():
@@ -84,6 +84,9 @@ def gerar_grafico_por_data(parent, data_selecionada, canvas_frame):
     horarios = [datetime.strptime(dado['horario'], '%Y-%m-%dT%H:%M:%S') for dado in dados_filtrados]
     umidades_solo = [dado['umidade_solo'] for dado in dados_filtrados]
 
+    # Ordena os dados
+    horarios, umidades_solo = zip(*sorted(zip(horarios, umidades_solo)))
+
     fig, ax = plt.subplots(figsize=(8, 6))
 
     ax.plot(horarios, umidades_solo, label='Umidade do Solo (%)', color='blue', marker='o')
@@ -98,6 +101,9 @@ def gerar_grafico_por_data(parent, data_selecionada, canvas_frame):
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right")
 
+    # Define os limites do eixo X
+    ax.set_xlim(min(horarios), max(horarios))
+
     fig.tight_layout()
 
     canvas = FigureCanvasTkAgg(fig, master=canvas_frame)
@@ -105,6 +111,7 @@ def gerar_grafico_por_data(parent, data_selecionada, canvas_frame):
     canvas.get_tk_widget().pack(fill=BOTH, expand=True)
 
     canvas_frame.pack(fill=BOTH, expand=True)
+
 
 def grafico(parent):
 
@@ -127,7 +134,7 @@ def grafico(parent):
     canvas_frame.pack(fill=BOTH, expand=True)
 
 root = ctk.CTk()
-root.title("Jardim Inteligente ESP32")
+root.title("Rega automática")
 
 aba1 = ctk.CTkTabview(root)
 aba1.pack(fill="both", expand=True)

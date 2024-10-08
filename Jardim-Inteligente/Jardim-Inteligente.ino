@@ -4,8 +4,8 @@
 #include <NTPClient.h>
 #include <WiFiUdp.h>
 
-const char *ssid = "Casa";
-const char *password = "nildapereira";
+const char *ssid = "caba";
+const char *password = "doce3200@";
 const char *supabaseUrl = "https://vkrlyyyvattgjcwimumr.supabase.co";
 const char *supabaseApiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZrcmx5eXl2YXR0Z2pjd2ltdW1yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjE4NDU5MTEsImV4cCI6MjAzNzQyMTkxMX0.RQYD0a8Z3jBXCsuglOSgGMbhisZEgtOVSdHDeTabCIk";
 
@@ -20,7 +20,7 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", -3 * 3600);
 
 unsigned long ultimoEnvio = 0;
-const unsigned long intervaloEnvio = 100000;
+const unsigned long intervaloEnvio = 60000;
 
 void setup() {
   Serial.begin(115200);
@@ -98,23 +98,23 @@ void loop() {
     leitura = map(leitura, 4095, 0, 0, 100);
 
     if (leitura < limiarSeco) {
-      digitalWrite(RelePin, HIGH);  // Liga o relé
+      digitalWrite(RelePin, LOW);  // Liga o relé
     } else {
-      digitalWrite(RelePin, LOW);  // Desliga o relé
+      digitalWrite(RelePin, HIGH);  // Desliga o relé
     }
   }
 }
 
 void ligarRele() {
   controleManual = true;
-  digitalWrite(RelePin, HIGH);
+  digitalWrite(RelePin, LOW);
   server.send(200, "text/plain", "Relé ligado");
   Serial.println("Relé ligado via HTTP");
 }
 
 void desligarRele() {
   controleManual = true;
-  digitalWrite(RelePin, LOW);
+  digitalWrite(RelePin, HIGH);
   server.send(200, "text/plain", "Relé desligado");
   Serial.println("Relé desligado via HTTP");
 }

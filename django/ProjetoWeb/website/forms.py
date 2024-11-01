@@ -1,23 +1,29 @@
 from django import forms
+from cadastro.models import Funcionario
 
-class InsereFuncionarioForm(forms.Form):
-    nome = forms.CharField(
-        required=True,
-        max_length=255
-    )
-
-    sobrenome = forms.CharField(
-        required=True,
-        max_length=255
-    )
-
-    cpf = forms.CharField(
-        required=True,
-        max_length=14
-    )
-
-    tempo_de_servico = forms.IntegerField(
+class InsereFuncionarioForm(forms.ModelForm):
+    chefe = forms.BooleanField(
+        label='Este Funcionário exerce função de chefia?',
         required=True
     )
 
-    remuneracao = forms.DecimalField()
+    biografia = forms.CharField(
+        label='Biografia',
+        required=False,
+        widget=forms.Textarea
+    )
+
+
+    class Meta:
+        model = Funcionario
+
+        fields = [
+            'nome',
+            'sobrenome', 
+            'cpf',
+            'remuneracao'
+        ]
+
+        exclude = [
+            'tempo_de_servico'
+        ]

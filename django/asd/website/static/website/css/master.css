@@ -1,0 +1,93 @@
+/* Estilo básico da página */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* Estilo da tabela */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Cabeçalho da Tabela */
+th {
+    background-color: #004080;
+    color: #ffffff;
+    font-weight: bold;
+    padding: 10px;
+    text-align: left;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+/* Células da Tabela */
+td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    font-size: 0.9rem;
+    vertical-align: top;
+}
+
+/* Estilo das Colunas */
+td[data-column="Aula Nº"],
+td[data-column="Data"],
+td[data-column="C.H"] {
+    width: 8%;
+    font-weight: bold;
+}
+
+td[data-column="Fundamentos"],
+td[data-column="Conhecimentos"],
+td[data-column="Estratégias de Ensino"],
+td[data-column="Critérios de Avaliação"],
+td[data-column="Instrumentos de Avaliação"],
+td[data-column="Recursos"] {
+    width: 15%;
+}
+
+/* Coloração alternada nas linhas */
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+/* Título */
+h1,
+h2 {
+    color: #004080;
+    text-transform: uppercase;
+}
+
+/* Responsividade */
+@media screen and (max-width: 768px) {
+
+    table,
+    thead,
+    tbody,
+    th,
+    td,
+    tr {
+        display: block;
+    }
+
+    td {
+        padding: 10px;
+        border: none;
+        position: relative;
+        padding-left: 50%;
+        white-space: nowrap;
+        text-align: left;
+    }
+
+    td:before {
+        content: attr(data-column);
+        position: absolute;
+        left: 10px;
+        font-weight: bold;
+    }
+}

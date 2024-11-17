@@ -1,56 +1,61 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
-{% block title %}Cadastro de Funcionários{% endblock %}
+{% block title %}Cadastro de Tarefas{% endblock %}
 {% block conteudo %}
 <div class="container">
     <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Cadastro de Funcionário</h5>
+                    <h5 class="card-title">Cadastro de Tarefas</h5>
                     <p class="card-text">
                         Complete o formulário abaixo para cadastrar
-                        um novo <code>Funcionário</code>.
+                        uma nova <code>Tarefa</code>.
                     </p>
                     <form method="post">
-                        <!-- Não se esqueça dessa tag -->
                         {% csrf_token %}
-
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text">Nome</span>
+                                <span class="input-group-text">Descrição</span>
                             </div>
-                            {% render_field form.nome class+="form-control" %}
+                            {% render_field form.descricao class+="form-control" %}
                         </div>
 
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text">Sobrenome</span>
+                                <span class="input-group-text">Setor</span>
                             </div>
-                            {% render_field form.sobrenome class+="form-control" %}
+                            {% render_field form.setor class+="form-control" %}
                         </div>
 
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text">CPF</span>
+                                <span class="input-group-text">Prioridade</span>
                             </div>
-                            {% render_field form.cpf class+="form-control" %}
-                        </div>
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">
-                                    Tempo de Serviço
-                                </span>
-                            </div>
-                            {% render_field form.tempo_de_servico class+="form-control" %}
+                            {% render_field form.prioridade class+="form-control" %}
                         </div>
 
                         <div class="input-group mb-3">
                             <div class="input-group-prepend">
-                                <span class="input-group-text">Remuneração</span>
+                                <span class="input-group-text">Usuário</span>
                             </div>
-                            {% render_field form.remuneracao class+="form-control" %}
+                            {% render_field form.usuario class+="form-control" %}
                         </div>
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Data</span>
+                            </div>
+                            {% render_field form.data class+="form-control" type="date" %}
+                        </div>
+
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Status</span>
+                            </div>
+                            {% render_field form.status class+="form-control" %}
+                        </div>
+
                         <button class="btn btn-primary">Enviar</button>
                     </form>
                 </div>

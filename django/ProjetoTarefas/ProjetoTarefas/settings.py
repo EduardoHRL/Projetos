@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'website'
+    'website',
+    'widget_tweaks'
 ]
 
 MIDDLEWARE = [
@@ -79,12 +80,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'db_tarefas',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': 'senha123',
         'HOST': 'localhost',
-        'PORT': '3306',
-        'OPTIONS': {
-            'ssl': {'disabled': True},  # Desabilita o SSL
-        },
+        'PORT': '3306'
     }
 }
 
@@ -111,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'pt-br'
 
 TIME_ZONE = 'UTC'
 

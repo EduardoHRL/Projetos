@@ -1,0 +1,14 @@
+<form method="post">
+    {% csrf_token %}
+    <label for="{{ form.descricao.id_for_label }}">Descrição</label>
+    {{ form.descricao }}
+    <label for="{{ form.setor.id_for_label }}">Setor</label>
+    {{ form.setor }}
+    <label for="{{ form.prioridade.id_for_label }}">Prioridade</label>
+    {{ form.prioridade }}
+    <label for="{{ form.usuario.id_for_label }}">Usuário</label>
+    {{ form.usuario }}
+    <label for="{{ form.data.id_for_label }}">Data</label>
+    {{ form.data }}]
+    <button type="submit">Cadastrar</button>
+</form>

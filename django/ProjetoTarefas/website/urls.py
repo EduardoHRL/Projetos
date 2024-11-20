@@ -3,7 +3,11 @@ from django.urls import include, path
 from website import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.logar, name='logar'),
+
+    path('index/', views.index, name='index'),
+
+    path('cadastro/', views.cadastro, name='cadastro'),
 
     path('usuarios/', views.UsuarioListView.as_view(), name='lista_usuarios'),
 

@@ -21,6 +21,9 @@ class Tarefa(models.Model):
     prioridade = models.CharField(max_length=20, db_column='tar_prioridade')
     status = models.CharField(max_length=20, db_column='tar_status')
     data = models.DateField(db_column='tar_data')
+    usuario = models.ForeignKey(
+        Usuario, on_delete=models.CASCADE, related_name='tarefas', db_column='usu_codigo'
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tarefas')
 
     def __str__(self):

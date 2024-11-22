@@ -47,41 +47,9 @@ def cadastro(request):
             user = User.objects.create_user(username=username, password=senha)
             user.save()
             return HttpResponseRedirect(reverse('logar'))
-
         
     return render(request, 'cadastro.html')
     
-def usuarios(request):
-
-    usuarios = Usuario.objects.all()
-
-    contexto = {'usuarios': usuarios}
-
-    return render(request, 'usuarios.html', contexto)
-
-def cria_usuario(request):
-    form = request.POST.get.all()
-    if form.is_valid():
-        form.save()
-        return HttpResponseRedirect(reverse('lista_usuarios'))
-
-    return render(request, 'form_usuario.html', {'form_usuario': form})
-
-@login_required
-def tarefas(request):
-
-    tarefas = Tarefa.objects.filter(user=request.user)
-
-    return render(request, 'tarefas.html', {'tarefas': tarefas})
-
-def cria_tarefa(request):
-    form = request.POST.get.all()
-    if form.is_valid():
-        form.save()
-        return HttpResponseRedirect(reverse('lista_tarefas'))
-    
-    return render(request, 'form_tarefa.html', {'form_tarefa': form})
-
 class UsuarioListView(LoginRequiredMixin, ListView):
     template_name = 'lista_usuarios.html'
     model = Usuario
@@ -129,6 +97,9 @@ class TarefaCreateView(LoginRequiredMixin,CreateView):
     model = Tarefa
     form_class = InsereTarefaForm
     success_url = reverse_lazy('lista_tarefas')
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
 
 class TarefaDeleteView(LoginRequiredMixin,DeleteView):
     template_name = 'exclui_tarefa.html'

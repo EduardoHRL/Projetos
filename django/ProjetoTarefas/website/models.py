@@ -12,8 +12,6 @@ class Usuario(models.Model):
     class Meta:
         db_table = 'tbl_usuarios'
 
-
-
 class Tarefa(models.Model):
     tar_codigo = models.AutoField(primary_key=True)
     descricao = models.CharField(max_length=255, db_column='tar_descricao')

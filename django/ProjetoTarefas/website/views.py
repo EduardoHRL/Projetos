@@ -83,7 +83,6 @@ class UsuarioDeleteView(LoginRequiredMixin,DeleteView):
     content_object_name = 'usuarios'
     success_url = reverse_lazy('lista_usuarios')
 
-
 class TarefaListView(LoginRequiredMixin,ListView):
     template_name = 'lista_tarefas.html'
     model = Tarefa

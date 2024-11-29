@@ -10,7 +10,6 @@ class InsereUsuarioForm(forms.ModelForm):
             'email'
         ]
         exclude = []
-
 class InsereTarefaForm(forms.ModelForm):
     Opcoes = [
         ('Baixa', 'Baixa'),

@@ -69,4 +69,4 @@ class Horario_reserva(models.Model):
     )
 
     class Meta:
-        db_table = 'tbl_horario_reserva'
+        db_table = 'tbl_horario_reserva'  

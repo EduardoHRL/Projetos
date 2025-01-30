@@ -1,22 +1,41 @@
 <!DOCTYPE html>
 <html>
+{% load static %}
+
 <head>
+    <title>
+        {% block title %}Reservas{% endblock %}
+    </title>
+    {% block styles %}
     <style type="text/css">
-        body {
+        * {
             margin: 0;
+            padding: 0;
             font-family: Arial, sans-serif;
-            display: flex;
+            box-sizing: border-box;
         }
-        
-        .sidebar {
-            width: 150px;
-            height: 100%;
-            background-color:palegreen ;
+
+        .navbar {
+            width: 100%;
+            background-color: #363636;
             color: white;
             padding: 15px;
-            position:fixed ;
-            left: 0;
+            text-align: center;
+            position: fixed;
             top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .sidebar {
+            width: 150px;
+            height: 100vh;
+            background-color:palegreen ;
+            color: white;
+            padding: 20px;
+            position: fixed ;
+            left: 0;
+            top: 50px;
         }
 
         .sidebar a {
@@ -32,27 +51,19 @@
             background-color: #555;
         }
 
-        .conteudo {
-            margin-left: 270px;
-            padding: 20px;
-        }
     </style>
+    {% endblock %}
 </head>
 <body>
-    <div class="navbar navbar-expand-lg navbar-light bg-white" id="">
-        <div class="nav-item active">
-            <ul>
-
-            </ul>
-        </div>
+    <div class="navbar">
+        <h2>Pagina Inicial</h2>
     </div>
+
     <div class="sidebar">
         <a href="">Menu</a>
         <a href="">Menu 2</a>
     </div>
-
-    <div class="conteudo">
-        <h1>Conteudo</h1>
-    </div>
+    {% block conteudo %}{% endblock %}
+    {% block scripts %}{% endblock %}
 </body>
 </html>

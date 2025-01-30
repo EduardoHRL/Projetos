@@ -20,7 +20,7 @@ class Laboratorios(models.Model):
     lab_nome = models.CharField(max_length=255, db_column='lab_nome')
     lab_descricao = models.TextField(db_column='lab_descricao')
     lab_capacidade = models.IntegerField(db_column='lab_capacidade')
-    lab_status = models.CharField(db_column='lab_status')
+    lab_status = models.CharField(max_length=45, db_column='lab_status')
 
     def __str__(self):
         return self.lab_nome
@@ -33,12 +33,12 @@ class Reservas(models.Model):
     res_inicio = models.DateTimeField(db_column='res_inicio')
     res_fim = models.DateTimeField(db_column='res_fim')
     res_repeticao = models.BooleanField(db_column='res_repeticao', db_default=False)
-    res_status = models.CharField(db_column='res_status')
+    res_status = models.CharField(max_length=45, db_column='res_status')
     usuario = models.ForeignKey(
         Usuarios, on_delete=models.CASCADE, related_name='usuario', db_column='usu_codigo'
     )
     laboratorio = models.ForeignKey(
-        Laboratorios, on_delete=models.CASCADE, related_name='laboratorio', db_column='lab_codigo'
+        Laboratorios, on_delete=models.CASCADE, related_name='laboratorio_reservas', db_column='lab_codigo_res'
     )
 
     class Meta:
@@ -50,7 +50,7 @@ class Equipamentos(models.Model):
     equip_nome = models.CharField(max_length=30, db_column='equip_nome')
     equip_descricao = models.TextField(db_column='equip_descricao')
     laboratorio = models.ForeignKey(
-        Laboratorios, on_delete=models.CASCADE, related_name='laboratorio', db_column='lab_codigo'
+        Laboratorios, on_delete=models.CASCADE, related_name='laboratorio_equipamentos', db_column='lab_codigo_equip'
     )
 
     def __str__(self):
@@ -65,7 +65,7 @@ class Horario_reserva(models.Model):
     hor_fim = models.DateTimeField(db_column='hor_fim')
     hor_diasDisponiveis = models.DateField(db_column='hor_diasDisponiveis')
     laboratorio = models.ForeignKey(
-        Laboratorios, on_delete=models.CASCADE, related_name='laboratorio', db_column='lab_codigo'
+        Laboratorios, on_delete=models.CASCADE, related_name='laboratorio_horario_reserva', db_column='lab_codigo_hor'
     )
 
     class Meta:

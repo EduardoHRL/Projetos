@@ -78,7 +78,7 @@ WSGI_APPLICATION = 'tcc.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mylsql',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'db_tcc',
         'USER': 'root',
         'PASSWORD': 'senha123',

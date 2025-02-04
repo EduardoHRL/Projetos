@@ -50,6 +50,11 @@
         .sidebar a:hover {
             background-color: #555;
         }
+        .conteudo {
+            margin-left: 170px;
+            margin-top: 70px;
+            padding: 30px;
+        }
 
     </style>
     {% endblock %}
@@ -63,7 +68,9 @@
         <a href="">Menu</a>
         <a href="">Menu 2</a>
     </div>
-    {% block conteudo %}{% endblock %}
+    <div class=conteudo>
+        {% block conteudo %}{% endblock %}
+    </div>
     {% block scripts %}{% endblock %}
 </body>
 </html>

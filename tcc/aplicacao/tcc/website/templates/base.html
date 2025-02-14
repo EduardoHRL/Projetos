@@ -3,8 +3,10 @@
 {% load static %}
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
-        {% block title %}Reservas{% endblock %}
+        {% block title %}Página Inicial{% endblock %}
     </title>
     {% block styles %}
     <style type="text/css">
@@ -40,7 +42,7 @@
 
         .sidebar a {
             display: block;
-            color: white;
+            color: black;
             text-decoration: none;
             padding: 10px;
             margin: 5px 0;
@@ -65,10 +67,9 @@
     </div>
 
     <div class="sidebar">
-        <a href="">Menu</a>
-        <a href="">Menu 2</a>
+        <a href="">Laboratórios</a>
     </div>
-    <div class=conteudo>
+    <div class="conteudo">
         {% block conteudo %}{% endblock %}
     </div>
     {% block scripts %}{% endblock %}

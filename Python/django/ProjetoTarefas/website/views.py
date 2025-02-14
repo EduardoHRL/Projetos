@@ -80,7 +80,7 @@ class UsuarioUpdateView(LoginRequiredMixin,UpdateView):
 class UsuarioDeleteView(LoginRequiredMixin,DeleteView):
     template_name = 'exclui_usuario.html'
     model = Usuario
-    content_object_name = 'usuarios'
+    context_object_name = 'usuarios'
     success_url = reverse_lazy('lista_usuarios')
 
 class TarefaListView(LoginRequiredMixin,ListView):

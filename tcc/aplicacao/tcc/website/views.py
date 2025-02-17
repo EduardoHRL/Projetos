@@ -1,5 +1,5 @@
-from .models import Laboratorios, Usuarios
-from .forms import LaboratoriosForm, UsuariosForm
+from .models import Laboratorios, Usuarios, Escola
+from .forms import LaboratoriosForm, UsuariosForm, EscolaForm
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -12,7 +12,7 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 def index(request):
-    return render(request, "index.html")
+    return render(request, 'index.html')
 
 def logar(request):
     if request.method == 'POST':
@@ -64,7 +64,7 @@ def cadastro(request):
         return redirect('login')
 
     return render(request, 'cadastro.html')
-
+    
 def logout(request):
     request.session.flush()
     return redirect('login')

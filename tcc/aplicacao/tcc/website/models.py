@@ -70,3 +70,7 @@ class Horario_reserva(models.Model):
 
     class Meta:
         db_table = 'tbl_horario_reserva'  
+
+class Escola(models.Model):
+    nome = models.CharField(max_length=100)
+    logo = models.ImageField(upload_to='logos/')

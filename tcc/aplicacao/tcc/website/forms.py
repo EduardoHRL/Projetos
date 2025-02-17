@@ -1,5 +1,5 @@
 from django import forms
-from .models import Laboratorios, Usuarios
+from .models import Laboratorios, Usuarios, Escola
 
 class LaboratoriosForm(forms.ModelForm):
     class Meta:
@@ -26,3 +26,8 @@ class UsuariosForm(forms.ModelForm):
         widgets = {
             'usu_senha': forms.PasswordInput(attrs={'placeholder': 'Digite sua senha'})
         }
+
+class EscolaForm(forms.ModelForm):
+    class Meta:
+        model = Escola
+        fields = ['nome', 'logo']

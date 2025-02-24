@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Pagina Inicial{% endblock %}</title>
+    <style type="text/css">
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar {
+            display: flex;
+            background-color: lightseagreen;
+            padding: 15px 20px;
+            justify-content: space-between;
+            align-items: center;
+            
+        }
+
+        .menu {
+            display: flex;
+            gap: 20px;
+        }
+        .menu a {
+            text-decoration: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .titulo a{
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 30px;
+        }
+
+        form {
+            background-color: whitesmoke;
+            padding: 20px;
+            border-radius: 20px;
+            width: 400px;
+            margin: 20px auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color:darkslategrey;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: darkcyan;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color:#0056b3;
+        }
+
+        .cv {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cv a{
+            background-color: darkcyan;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="titulo">
+            <a href="{% url 'index' %}">Papelaria</a>
+        </div>
+
+        <div class="menu">
+            <a href="{% url 'cadastrar_livro' %}">Livros</a>
+            <a href="{% url 'cadastrar_autor' %}">Autores</a>
+            <a href="{% url 'estoque_entrada' %}">Estoque de Compras</a>
+            <a href="{% url 'estoque_saida' %}">Estoque de Vendas</a>
+            <a href="{% url 'estoque_atual' %}">Estoque Atual</a>
+        </div>
+    </nav>
+    {% block conteudo %}
+    {% endblock %}
+</body>
+</html>

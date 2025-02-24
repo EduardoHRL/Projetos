@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Estoque de Vendas{% endblock %}
+{% block conteudo %}
+    <h1>Estoque de Vendas</h1>
+    <a href="{% url 'vender_estoque' %}">Vender Livros</a>
+
+    <table>
+        <tr>
+            <th>Livro</th>
+            <th>Quantidade</th>
+            <th>Data</th>
+        </tr>
+        {% for e in estoque_saida %}
+            <tr>
+                <td>{{ e.livro_vendido }}</td>
+                <td>{{ e.quantidade }}</td>
+                <td>{{ e.data_venda }}</td>
+            </tr>
+    
+        {% endfor %}
+    </table>        
+{% endblock %}

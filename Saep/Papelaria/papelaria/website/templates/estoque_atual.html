@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+<h1>Estoque de Livros</h1>
+<table>
+    <tr>
+        <th>Título</th>
+        <th>Quantidade em Estoque</th>
+        <th>Preço (R$)</th>
+    </tr>
+    {% for item in estoque %}
+    <tr>
+        <td>{{ item.titulo }}</td>
+        <td>{{ item.quantidade }}</td>
+        <td>{{ item.preco|floatformat:2 }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

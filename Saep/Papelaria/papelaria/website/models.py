@@ -16,7 +16,7 @@ class Autores(models.Model):
 
 class Compras(models.Model):
     id_compra = models.AutoField(primary_key=True)
-    livro_comprado = models.ForeignKey('Livros', on_delete=models.CASCADE, db_column='livro_comprado', blank=True, null=True, related_name='compras')
+    livro_comprado = models.ForeignKey('Livros', on_delete=models.CASCADE, db_column='livro_comprado', blank=True, null=True, related_name="compras")
     quantidade = models.IntegerField(blank=True, null=True)
     data_compra = models.DateTimeField(blank=True, null=True, auto_now_add= True)
 
@@ -24,7 +24,8 @@ class Compras(models.Model):
         db_table = 'compras'
 
     def __str__(self):
-        return self.livro_comprado
+        return self.livro_comprado.titulo if self.livro_comprado else "Compra sem livro"
+
 
 
 class Livros(models.Model):
@@ -55,7 +56,7 @@ class LivrosAutores(models.Model):
 
 class Vendas(models.Model):
     id_venda = models.AutoField(primary_key=True)
-    livro_vendido = models.ForeignKey(Livros, on_delete=models.CASCADE, db_column='livro_vendido', blank=True, null=True, related_name='vendas')
+    livro_vendido = models.ForeignKey(Livros, on_delete=models.CASCADE, db_column='livro_vendido', blank=True, null=True, related_name="vendas")
     quantidade = models.IntegerField(blank=True, null=True)
     data_venda = models.DateTimeField(blank=True, null=True, auto_now_add=True)
 

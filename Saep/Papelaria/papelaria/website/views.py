@@ -97,6 +97,14 @@ class Vender(CreateView):
 class EstoqueAtualView(TemplateView):
     template_name = 'estoque_atual.html'
 
+    def get_queryset(self):
+        queryset = Livros.objects.all()
+        livro_filtro = self.request.GET.get("livro")
+
+        if livro_filtro:
+            queryset = queryset.filter(titulo=livro_filtro)
+        return queryset
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -124,6 +132,8 @@ class EstoqueAtualView(TemplateView):
                 'quantidade': saldo,
                 'preco': preco
             })
-
+        context["livros"] = Livros.objects.all()
         context['estoque'] = estoque
         return context
+    
+    

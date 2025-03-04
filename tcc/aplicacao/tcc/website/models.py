@@ -7,7 +7,7 @@ class Usuarios(models.Model):
     usu_cpf = models.CharField(max_length=14, db_column='usu_cpf')
     usu_telefone = models.CharField(max_length=11, db_column='usu_telefone')
     usu_tipoUsuario = models.CharField(max_length=13, db_column='usu_tipoUsuario')
-    usu_senha = models.CharField(max_length=45, db_column='usu_senha')
+    usu_senha = models.CharField(max_length=50, db_column='usu_senha')
 
     def __str__(self):
         return self.usu_nome
@@ -73,4 +73,7 @@ class Horario_reserva(models.Model):
 
 class Escola(models.Model):
     nome = models.CharField(max_length=100)
-    logo = models.ImageField(upload_to='logos/')
+    logo = models.ImageField(default='fallback.png', blank=True)
+
+    def __str__(self):
+        return self.nome

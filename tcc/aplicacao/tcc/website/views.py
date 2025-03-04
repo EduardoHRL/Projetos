@@ -2,12 +2,10 @@ from .models import Laboratorios, Usuarios, Escola
 from .forms import LaboratoriosForm, UsuariosForm, EscolaForm
 from django.shortcuts import redirect, render
 from django.urls import reverse, reverse_lazy
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic.list import ListView
+from django.views.generic import *
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
 from django.http import HttpResponseRedirect
-from django.contrib.auth.models import User
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -23,11 +21,11 @@ def logar(request):
             usuario = Usuarios.objects.get(usu_email = email)
         except Usuarios.DoesNotExist:
             messages.error(request, 'Email e/ou senha estão incorretos')
-            return redirect('login')
+            return redirect('logar')
             
         if check_password(senha, usuario.usu_senha):
             request.session['usuario_id'] = usuario.usu_codigo
-            messages.success(request, 'Login realizado com sucesso.')
+            request.session['usuario_nome'] = usuario.usu_nome
             return HttpResponseRedirect(reverse('index'))
         else:
             messages.error(request, 'Email e/ou senha estão incorretos')
@@ -43,13 +41,12 @@ def cadastro(request):
         tipoUsuario = request.POST.get('tipoUsuario')
         senha = request.POST.get('senha')
 
-        if Usuarios.objects.filter(usu_email=email).exists():
-            messages.error(request, 'Email já existe.')
-            return redirect('cadastro.html')
-        
-        if Usuarios.objects.filter(usu_cpf=cpf).exists():
-            messages.error(request, 'Cpf já existe.')
-            return redirect('cadastro.html')
+        if Usuarios.objects.filter(usu_email=email).exists() or Usuarios.objects.filter(usu_cpf=cpf).exists():
+            if Usuarios.objects.filter(usu_email=email).exists():
+                messages.error(request, 'Email já existe.')
+            if Usuarios.objects.filter(usu_cpf=cpf).exists():
+                messages.error(request, 'Cpf já existe.')
+            return redirect('cadastro')
 
         usuarios = Usuarios.objects.create(
             usu_nome = nome,
@@ -61,13 +58,14 @@ def cadastro(request):
         )
 
         messages.success(request, 'Cadastro realizado com sucesso')
-        return redirect('login')
+        return HttpResponseRedirect(reverse('logar'))
 
     return render(request, 'cadastro.html')
     
 def logout(request):
     request.session.flush()
-    return redirect('login')
+    messages.info(request, 'Tenha um bom dia!')
+    return redirect('logar')
 
 class UsuariosListView(LoginRequiredMixin, ListView):
     template_name = 'lista_usuarios.html'

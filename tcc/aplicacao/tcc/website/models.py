@@ -4,11 +4,11 @@ class Usuarios(models.Model):
     usu_codigo = models.AutoField(primary_key=True, db_column='usu_codigo')
     usu_nome = models.CharField(max_length=255, db_column='usu_nome')
     usu_email = models.EmailField(max_length=255, db_column='usu_email')
-    usu_cpf = models.CharField(max_length=14, db_column='usu_cpf')
+    usu_cpf = models.CharField(max_length=14, db_column='usu_cpf', unique=True)
     usu_telefone = models.CharField(max_length=11, db_column='usu_telefone')
+    usu_senha = models.CharField(max_length=255, db_column='usu_senha')
     usu_tipoUsuario = models.CharField(max_length=13, db_column='usu_tipoUsuario')
-    usu_senha = models.CharField(max_length=50, db_column='usu_senha')
-
+    
     def __str__(self):
         return self.usu_nome
     

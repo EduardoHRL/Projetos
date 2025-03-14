@@ -7,7 +7,7 @@ class ClientesForm(forms.ModelForm):
 
         nome = forms.CharField(max_length=100, required=True, label='Nome')
         email = forms.EmailField(max_length=255, required=True, label='Email')
-        nome = forms.IntegerField(min_value=11, required=True, label='Telefone')
+        nome = forms.IntegerField(required=True, label='Telefone')
 
         fields = [
             'nome',

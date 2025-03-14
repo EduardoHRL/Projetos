@@ -5,7 +5,7 @@ class Usuarios(models.Model):
     usu_nome = models.CharField(max_length=255, db_column='usu_nome')
     usu_email = models.EmailField(max_length=255, db_column='usu_email')
     usu_cpf = models.CharField(max_length=14, db_column='usu_cpf', unique=True)
-    usu_telefone = models.CharField(max_length=11, db_column='usu_telefone')
+    usu_telefone = models.CharField(max_length=15, db_column='usu_telefone')
     usu_senha = models.CharField(max_length=255, db_column='usu_senha')
     usu_tipoUsuario = models.CharField(max_length=13, db_column='usu_tipoUsuario')
     

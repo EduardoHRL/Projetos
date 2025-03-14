@@ -14,7 +14,9 @@ urlpatterns = [
     path('laboratorios/excluir/<int:pk>', views.LaboratoriosDeleteView.as_view(), name='exclui_laboratorios'),
     path('laboratorios/<int:pk>', views.LaboratoriosUpdateView.as_view(), name='atualiza_laboratorios'),
 
-    path('logout/', views.logout, name='logout')
+    path('logout/', views.logout, name='logout'),
+
+    path('lab/', views.lab, name='lab'),
 
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

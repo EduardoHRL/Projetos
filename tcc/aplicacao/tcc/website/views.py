@@ -12,6 +12,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 def index(request):
     return render(request, 'index.html')
 
+def lab(request):
+    return render(request, 'laboratorios.html')
+
 def logar(request):
     if request.method == 'POST':
         email = request.POST.get('email')

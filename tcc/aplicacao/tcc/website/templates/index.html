@@ -1,11 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    
-</body>
-</html>
+{% extends 'base.html' %}
+{% block title %}Início{% endblock %}
+{% block content %}
+    <main class="flex-1 p-4">
+        <div class="text-2xl font-medium text-center">
+            Seja Bem Vindo, Eduardo
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 px-4">
+            <div class="w-full bg-gray-800 border border-gray-200 rounded-lg shadow-sm">
+                <a href="#">
+                    <img src="https://plus.unsplash.com/premium_photo-1680807869780-e0876a6f3cd5?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8c2FsYSUyMGRlJTIwYXVsYXxlbnwwfHwwfHx8MA%3D%3D" alt=""
+                        class="rounded-t-lg w-full h-52">
+                    <div class="p-5">
+                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-white">Deseja reservar um labóratorio?</h5>
+                        <p class="mb-3 font-normal text-gray-400">Clique aqui para reservar um labóratorio o mais rapido possível!</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="w-full bg-gray-800 border border-gray-200 rounded-lg shadow-sm">
+                <a href="#">
+                    <img src="https://d1br4h274rc9sc.cloudfront.net/content/agenda_04_4f0a5c3c1f.webp" alt=""
+                        class="rounded-t-lg w-full h-52">
+                    <div class="p-5">
+                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-white">Que tal dar uma olhadinha no cronograma?</h5>
+                        <p class="mb-3 font-normal text-gray-400">Clique aqui para ver a agenda em tempo real!</p>
+                    </div>
+                </a>
+            </div>
+
+            <div class="w-full bg-gray-800 border border-gray-200 rounded-lg shadow-sm">
+                <a href="#">
+                    <img src="https://plus.unsplash.com/premium_photo-1680807869780-e0876a6f3cd5?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8c2FsYSUyMGRlJTIwYXVsYXxlbnwwfHwwfHx8MA%3D%3D" alt=""
+                        class="rounded-t-lg w-full h-52">
+                    <div class="p-5">
+                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-white">Deseja reservar um labóratorio?</h5>
+                        <p class="mb-3 font-normal text-gray-400">Clique aqui para reservar um labóratorio o mais rapido possível!</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </main>
+{% endblock %}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Página Inicial{% endblock %}</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+
+<body class="h-screen bg-gray-100">
+    <div class="h-full flex flex-col relative">
+        <nav class="bg-gray-800 text-white p-4 flex items-center justify-between">
+            <div class="relative flex ml-auto justify-items-end cursor-pointer" onclick="toggleDropdown(event)">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/SENAI_logo_2024.png"
+                    class="inline-flex w-14 h-14 rounded-full object-contain p-1 shadow-md cursor-pointer"
+                    alt="Imagem da Escola">
+                <i data-lucide="chevron-down" width="12px" height="12px"
+                    class="absolute right-1 bottom-0 bg-white text-black rounded-full shadow-md"></i>
+                <div id="dropdown"
+                    class="hidden absolute right-0 top-16 mt-2 w-64 bg-white border rounded-lg shadow-lg z-10">
+                    <ul class="py-2 text-gray-700">
+                        <div class="flex px-4 py-3 m-2 rounded-lg items-center gap-4 hover:bg-gray-300 transition-all">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/0/05/SENAI_logo_2024.png"
+                                class="inline-flex w-14 h-14 rounded-full object-contain p-1 shadow-md cursor-pointer"
+                                alt="Imagem da Escola">
+                            <div class="text-medium truncate">
+                                Senai
+                            </div>
+                        </div>
+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-200">Suporte</a></li>
+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-200">Ajuda</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="flex flex-1">
+            <aside class="w-56 bg-gray-200 p-4 text-gray-900">
+                <ul class="overflow-y-auto space-y-2">
+                    <li
+                        class="flex items-center p-3 rounded-lg cursor-pointer hover:bg-gray-700 hover:text-white transition-all">
+                        <a href="#" class="flex items-center gap-2">
+                            <i data-lucide="library" class="duration-700 transition-all"></i>
+                            <span class="flex-1 ms-2 whitespace-nowrap">Início</span>
+                        </a>
+                    </li>
+                    <li
+                        class="flex items-center p-3 rounded-lg cursor-pointer hover:bg-gray-700 hover:text-white transition-all">
+                        <a href="#" class="flex items-center gap-2">
+                            <i data-lucide="boxes" class="duration-700 transition-all"></i>
+                            <span class="flex-1 ms-2 whitespace-nowrap">Laboratórios</span>
+                        </a>
+                    </li>
+                    <li
+                        class="flex items-center p-3 rounded-lg cursor-pointer hover:bg-gray-700 hover:text-white transition-all">
+                        <a href="#" class="flex items-center gap-2">
+                            <i data-lucide="calendar" class="duration-700 transition-all"></i>
+                            <span class="flex-1 ms-2 whitespace-nowrap">Agenda</span>
+                        </a>
+                    </li>
+                    <li
+                        class="flex items-center p-3 rounded-lg cursor-pointer hover:bg-gray-700 hover:text-white transition-all">
+                        <a href="#" class="flex items-center gap-2">
+                            <i data-lucide="clipboard" class="duration-700 transition-all"></i>
+                            <span class="flex-1 ms-2 whitespace-nowrap">Relatórios</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </aside>
+            <main>
+                {% block content %}
+                {% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Função para mostrar/ocultar o dropdown
+        function toggleDropdown(event) {
+            event.stopPropagation();  // Impede o fechamento ao clicar no próprio botão
+            document.getElementById("dropdown").classList.toggle("hidden");
+        }
+
+        // Fecha o dropdown ao clicar fora
+        document.addEventListener("click", function (event) {
+            const dropdown = document.getElementById("dropdown");
+            const trigger = document.querySelector(".flex.gap-4");
+
+            if (!trigger.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.add("hidden");
+            }
+        });
+    </script>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+    {% block scripts %}{% endblock %}
+
+</body>
+
+</html>

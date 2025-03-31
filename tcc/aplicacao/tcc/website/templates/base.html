@@ -38,38 +38,33 @@
         <div class="flex flex-1">
             <aside class="w-56 bg-gray-200 p-4 text-gray-900">
                 <ul class="overflow-y-auto space-y-2">
-                    <li
-                        class="flex items-center p-3 rounded-lg cursor-pointer hover:bg-gray-700 hover:text-white transition-all">
-                        <a href="#" class="flex items-center gap-2">
+                    <li>
+                        <a href="{% url 'index' %}" class="flex items-center gap-2 p-3 rounded-lg cursor-pointer hover:bg-gray-700 hover:text-white transition-all">
                             <i data-lucide="library" class="duration-700 transition-all"></i>
                             <span class="flex-1 ms-2 whitespace-nowrap">Início</span>
                         </a>
                     </li>
-                    <li
-                        class="flex items-center p-3 rounded-lg cursor-pointer hover:bg-gray-700 hover:text-white transition-all">
-                        <a href="#" class="flex items-center gap-2">
+                    <li>
+                        <a href="{% url 'lab' %}" class="flex items-center gap-2 p-3 rounded-lg cursor-pointer hover:bg-gray-700 hover:text-white transition-all">
                             <i data-lucide="boxes" class="duration-700 transition-all"></i>
                             <span class="flex-1 ms-2 whitespace-nowrap">Laboratórios</span>
                         </a>
                     </li>
-                    <li
-                        class="flex items-center p-3 rounded-lg cursor-pointer hover:bg-gray-700 hover:text-white transition-all">
-                        <a href="#" class="flex items-center gap-2">
+                    <li>
+                        <a href="#" class="flex items-center gap-2 p-3 rounded-lg cursor-pointer hover:bg-gray-700 hover:text-white transition-all">
                             <i data-lucide="calendar" class="duration-700 transition-all"></i>
                             <span class="flex-1 ms-2 whitespace-nowrap">Agenda</span>
                         </a>
                     </li>
-                    <li
-                        class="flex items-center p-3 rounded-lg cursor-pointer hover:bg-gray-700 hover:text-white transition-all">
-                        <a href="#" class="flex items-center gap-2">
+                    <li>
+                        <a href="#" class="flex items-center gap-2 p-3 rounded-lg cursor-pointer hover:bg-gray-700 hover:text-white transition-all">
                             <i data-lucide="clipboard" class="duration-700 transition-all"></i>
                             <span class="flex-1 ms-2 whitespace-nowrap">Relatórios</span>
                         </a>
                     </li>
-
                 </ul>
             </aside>
-            <main>
+            <main class="flex-1 p-6 overflow-y-auto">
                 {% block content %}
                 {% endblock %}
             </main>

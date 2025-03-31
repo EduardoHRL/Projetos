@@ -29,11 +29,11 @@
                             <td style="padding: 8px;">{{ t.tar_prioridade }}</td>
                             <td style="padding: 8px;">{{ t.usu }}</td>
                             <td style="padding: 8px;">{{ t.tar_data }}</td>
+                            <td style="padding: 8px;">{{ t.tar_status }}</td>
                             <td style="padding: 8px;">
                                 <form method="post" action="{% url 'atualiza_status' pk=t.tar_id %}" style="display: flex; gap: 5px; align-items: center;">
                                     {% csrf_token %}
                                     <select name="novo_status" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px;">
-                                        <option value="A fazer" {% if t.tar_status == 'A fazer' %}selected{% endif %}>A fazer</option>
                                         <option value="Pendente" {% if t.tar_status == 'Pendente' %}selected{% endif %}>Pendente</option>
                                         <option value="Concluido" {% if t.tar_status == 'Concluido' %}selected{% endif %}>Concluído</option>
                                     </select>
@@ -74,16 +74,16 @@
                     {% if t.tar_status == 'Pendente' %}
                         <tr style="border-bottom: 1px solid #ccc;">
                             <td style="padding: 8px;">{{ t.tar_descricao }}</td>
-                            <td style="padding: 8px;">{{ t.tar_nomeSetor }}</td>
+                            <td style="padding: 8px;">{{ t.tar_nomesetor }}</td>
                             <td style="padding: 8px;">{{ t.tar_prioridade }}</td>
                             <td style="padding: 8px;">{{ t.usu }}</td>
                             <td style="padding: 8px;">{{ t.tar_data }}</td>
+                            <td style="padding: 8px;">{{ t.tar_status }}</td>
                             <td style="padding: 8px;">
                                 <form method="post" action="{% url 'atualiza_status' pk=t.tar_id %}" style="display: flex; gap: 5px; align-items: center;">
                                     {% csrf_token %}
                                     <select name="novo_status" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px;">
                                         <option value="A fazer" {% if t.tar_status == 'A fazer' %}selected{% endif %}>A fazer</option>
-                                        <option value="Pendente" {% if t.tar_status == 'Pendente' %}selected{% endif %}>Pendente</option>
                                         <option value="Concluido" {% if t.tar_status == 'Concluido' %}selected{% endif %}>Concluído</option>
                                     </select>
                                     <button type="submit" style="padding: 5px 10px; border: none; border-radius: 3px; background-color: #007bff; color: white; cursor: pointer;">Alterar</button>
@@ -123,17 +123,17 @@
                     {% if t.tar_status == 'Concluido' %}
                         <tr style="border-bottom: 1px solid #ccc;">
                             <td style="padding: 8px;">{{ t.tar_descricao }}</td>
-                            <td style="padding: 8px;">{{ t.tar_nomeSetor }}</td>
+                            <td style="padding: 8px;">{{ t.tar_nomesetor }}</td>
                             <td style="padding: 8px;">{{ t.tar_prioridade }}</td>
                             <td style="padding: 8px;">{{ t.usu }}</td>
                             <td style="padding: 8px;">{{ t.tar_data }}</td>
+                            <td style="padding: 8px;">{{ t.tar_status }}</td>
                             <td style="padding: 8px;">
                                 <form method="post" action="{% url 'atualiza_status' pk=t.tar_id %}" style="display: flex; gap: 5px; align-items: center;">
                                     {% csrf_token %}
                                     <select name="novo_status" style="padding: 5px; border: 1px solid #ccc; border-radius: 3px;">
                                         <option value="A fazer" {% if t.tar_status == 'A fazer' %}selected{% endif %}>A fazer</option>
                                         <option value="Pendente" {% if t.tar_status == 'Pendente' %}selected{% endif %}>Pendente</option>
-                                        <option value="Concluido" {% if t.tar_status == 'Concluido' %}selected{% endif %}>Concluído</option>
                                     </select>
                                     <button type="submit" style="padding: 5px 10px; border: none; border-radius: 3px; background-color: #007bff; color: white; cursor: pointer;">Alterar</button>
                                 </form>

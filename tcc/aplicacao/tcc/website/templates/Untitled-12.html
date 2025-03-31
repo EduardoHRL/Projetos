@@ -1,99 +1,132 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-br">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Exemplos de Animações com GSAP e Tailwind</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* Custom Styles for smoother animations */
-    .element {
-      background-color: #2b6cb0;
-      padding: 20px;
-      margin: 20px;
-      color: white;
-      border-radius: 8px;
-      width: 150px;
-      text-align: center;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portas com Destaque</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
 </head>
-<body class="bg-gray-900 h-screen flex justify-center items-center">
 
-  <!-- Card Expansivo -->
-  <div class="card bg-blue-500 rounded-lg p-4 text-white shadow-lg cursor-pointer">
-    <div class="close-btn absolute top-0 right-0 m-4 cursor-pointer text-2xl font-bold">X</div>
-    <h2 class="title text-xl font-bold">Card Expansivo</h2>
-    <p class="description text-sm">Descrição curta do card.</p>
-    <div class="details mt-4 text-sm text-gray-200" style="display: none;">
-      <p><strong>Detalhe 1:</strong> Mais informações sobre o card.</p>
-      <p><strong>Detalhe 2:</strong> Mais conteúdo interessante.</p>
-      <p><strong>Detalhe 3:</strong> Outro conteúdo útil.</p>
+<body class="bg-gray-100 min-h-screen p-8">
+    <div class="container mx-auto">
+        <h1 class="text-3xl font-bold text-center mb-8">Portas com Destaque</h1>
+        <div class="flex justify-center">
+            <div id="card" class="w-72 bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transition-all duration-300">
+                <div class="p-5">
+                    <h2 class="text-xl font-semibold text-gray-800">Projeto</h2>
+                    <p class="text-gray-600 mt-2">Clique para ver detalhes completos</p>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- Elemento com Hover -->
-  <div class="element bg-blue-700 rounded-lg text-white p-4 cursor-pointer">Hover me</div>
+    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-0 z-50 pointer-events-none"></div>
+    
+    <div id="expanded-card" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl p-6 w-11/12 max-w-2xl max-h-[80vh] overflow-y-auto opacity-0 scale-90 z-50 pointer-events-none">
+        <div id="close-btn" class="absolute top-4 right-4 m-4 cursor-pointer text-2xl font-bold text-gray-600 hover:text-gray-800">×</div>
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Detalhes Completos do Projeto</h2>
+        <p class="text-gray-700 mb-6">Este projeto revolucionário combina design inovador com tecnologia de ponta.</p>
+        <h3 class="font-semibold text-gray-800 mb-3">Recursos Principais:</h3>
+        <ul class="list-disc pl-5 space-y-2 mb-6">
+            <li>Interface intuitiva e moderna</li>
+            <li>Tecnologia de última geração</li>
+            <li>Integração com múltiplas plataformas</li>
+            <li>Suporte 24/7</li>
+        </ul>
+        <h3 class="font-semibold text-gray-800 mb-3">Especificações:</h3>
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <div><span class="text-gray-600">Versão:</span> <span class="text-gray-800 ml-2">2.5.3</span></div>
+            <div><span class="text-gray-600">Lançamento:</span> <span class="text-gray-800 ml-2">2023</span></div>
+        </div>
+        <div class="flex justify-between">
+            <button class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">Saiba Mais</button>
+        </div>
+    </div>
 
-  <script>
-    // Card Expansivo (entrada e saída)
-    const card = document.querySelector('.card');
-    const closeBtn = document.querySelector('.close-btn');
-    const details = document.querySelector('.details');
-    const description = document.querySelector('.description');
-    let expanded = false;
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const card = document.getElementById('card');
+            const modalOverlay = document.getElementById('modal-overlay');
+            const expandedCard = document.getElementById('expanded-card');
+            const closeBtn = document.getElementById('close-btn');
+            let isOpen = false;
 
-    // Ao clicar no card, expande
-    card.addEventListener('click', () => {
-      if (!expanded) {
-        gsap.to(card, {
-          duration: 0.5,
-          width: '80vw',
-          height: '80vh',
-          opacity: 1,
-          ease: 'power2.inOut'
+            // Efeito de hover no card
+            card.addEventListener('mouseenter', () => {
+                gsap.to(card, { 
+                    scale: 1.05, 
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, { 
+                    scale: 1, 
+                    duration: 0.3,
+                    ease: "power2.out"
+                });
+            });
+
+            function openModal() {
+                if (isOpen) return;
+                isOpen = true;
+                
+                // Ativa interação
+                modalOverlay.classList.remove('pointer-events-none');
+                expandedCard.classList.remove('pointer-events-none');
+                
+                // Garante que o elemento está visível antes da animação
+                gsap.set([modalOverlay, expandedCard], { visibility: 'visible' });
+                
+                // Animação do overlay
+                gsap.to(modalOverlay, { 
+                    opacity: 0.5, 
+                    duration: 0.5, 
+                    ease: "power2.out" 
+                });
+                
+                // Animação do card expandido
+                gsap.to(expandedCard, { 
+                    opacity: 1, 
+                    scale: 1, 
+                    duration: 0.5, 
+                    ease: "power2.out" 
+                });
+            }
+
+            function closeModal() {
+                if (!isOpen) return;
+                
+                // Desativa interação durante a animação
+                modalOverlay.classList.add('pointer-events-none');
+                expandedCard.classList.add('pointer-events-none');
+                
+                // Animação de fechamento
+                gsap.to([expandedCard, modalOverlay], { 
+                    opacity: 0, 
+                    duration: 0.3, 
+                    ease: "power2.in",
+                    onComplete: () => {
+                        // Reset para o estado inicial
+                        gsap.set(expandedCard, { scale: 0.9 });
+                        isOpen = false;
+                    }
+                });
+            }
+
+            // Event listeners
+            card.addEventListener('click', openModal);
+            closeBtn.addEventListener('click', closeModal);
+            modalOverlay.addEventListener('click', closeModal);
+            
+            // Impede que o clique no card expandido feche o modal
+            expandedCard.addEventListener('click', (e) => {
+                e.stopPropagation();
+            });
         });
-        details.style.display = 'block'; // Mostra os detalhes
-        description.textContent = 'Aqui estão mais informações detalhadas sobre o card expandido. Você pode colocar tudo o que quiser aqui!';
-        expanded = true;
-      }
-    });
-
-    // Ao clicar no botão de fechar, fecha
-    closeBtn.addEventListener('click', (e) => {
-      e.stopPropagation(); // Impede que o clique no "X" dispare a animação de expansão
-
-      if (expanded) {
-        gsap.to(card, {
-          duration: 0.5,
-          width: '250px',
-          height: '150px',
-          opacity: 0.9,
-          ease: 'power2.inOut'
-        });
-        details.style.display = 'none'; // Esconde os detalhes
-        description.textContent = 'Descrição curta do card.';
-        expanded = false;
-      }
-    });
-
-    // Hover do Elemento (efeito de zoom)
-    const element = document.querySelector('.element');
-    element.addEventListener('mouseover', () => {
-      gsap.to(element, { scale: 1.2, duration: 0.3 });
-    });
-    element.addEventListener('mouseout', () => {
-      gsap.to(element, { scale: 1, duration: 0.3 });
-    });
-
-    // Sequência de animações com GSAP
-    const tl = gsap.timeline();
-    tl.to('.card', { opacity: 1, duration: 1 })
-      .to('.element', { x: 100, duration: 1, delay: 0.5 })
-      .to('.element', { rotation: 360, duration: 1, delay: 0.5 });
-  </script>
-
+    </script>
 </body>
 </html>

@@ -70,6 +70,7 @@ def logout(request):
     messages.info(request, 'Tenha um bom dia!')
     return redirect('logar')
 
+
 class UsuariosListView(LoginRequiredMixin, ListView):
     template_name = 'lista_usuarios.html'
     model = Usuarios

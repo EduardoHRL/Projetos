@@ -29,6 +29,8 @@ ALLOWED_HOSTS = []
 
 LOGIN_URL = '/login'
 
+AUTH_USER_MODEL = 'website.CustomUser'
+
 # Application definition
 
 INSTALLED_APPS = [

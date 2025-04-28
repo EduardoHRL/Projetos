@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Reservar Laboratório{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-md">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Nova Reserva</h1>
+    
+    <form method="post" class="space-y-6" id="reserva-form">
+        {% csrf_token %}
+        <div class="space-y-2">
+            <label for="{{ form.laboratorio.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                Laboratório <span class="text-red-500">*</span>
+            </label>
+            {% render_field form.laboratorio class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %}
+            {% if form.laboratorio.errors %}
+                <div class="text-sm text-red-600">{{ form.laboratorio.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+                <label for="{{ form.res_inicio.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Data e Hora de Início <span class="text-red-500">*</span>
+                </label>
+                {% render_field form.res_inicio class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %}
+                {% if form.res_inicio.errors %}
+                    <div class="text-sm text-red-600">{{ form.res_inicio.errors }}</div>
+                {% endif %}
+            </div>
+
+            <div class="space-y-2">
+                <label for="{{ form.res_fim.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Data e Hora de Término <span class="text-red-500">*</span>
+                </label>
+                {% render_field form.res_fim class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %}
+                {% if form.res_fim.errors %}
+                    <div class="text-sm text-red-600">{{ form.res_fim.errors }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="space-y-2">
+            <label for="{{ form.res_repeticao.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                Repetir Reserva
+            </label>
+            {% render_field form.res_repeticao class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %}
+            <p class="text-xs text-gray-500 mt-1">Selecione a frequência de repetição da reserva</p>
+        </div>
+
+        <div id="repeticao-fields" class="bg-gray-50 p-4 rounded-lg space-y-4 hidden">
+            <div id="semanal-fields" class="space-y-4 hidden">
+                <div class="flex items-center space-x-4">
+                    <label for="{{ form.res_intervalo_semanas.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                        Repetir a cada
+                    </label>
+                    {% render_field form.res_intervalo_semanas class="w-20 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %}
+                    <span class="text-sm text-gray-700">semanas</span>
+                    {% if form.res_intervalo_semanas.errors %}
+                        <div class="text-sm text-red-600">{{ form.res_intervalo_semanas.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Dias da Semana</label>
+                    <div class="flex flex-wrap gap-3">
+                        {% for choice in form.res_dia_semana %}
+                            <label class="inline-flex items-center">
+                                {{ choice.tag }}
+                                <span class="ml-2 text-sm text-gray-700">{{ choice.choice_label }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                    {% if form.res_dia_semana.errors %}
+                        <div class="text-sm text-red-600">{{ form.res_dia_semana.errors }}</div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label for="{{ form.res_data_final_repeticao.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                    Data Final da Repetição
+                </label>
+                {% render_field form.res_data_final_repeticao class="w-full md:w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %}
+                {% if form.res_data_final_repeticao.errors %}
+                    <div class="text-sm text-red-600">{{ form.res_data_final_repeticao.errors }}</div>
+                {% endif %}
+                <p class="text-xs text-gray-500">A repetição será feita até esta data</p>
+            </div>
+        </div>
+
+        <div class="space-y-2">
+            <label for="{{ form.res_descricao.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                Descrição da Reserva
+            </label>
+            {% render_field form.res_descricao class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" rows="3" %}
+            <p class="text-xs text-gray-500">Descreva o propósito desta reserva (mínimo 10 caracteres)</p>
+        </div>
+
+        <div class="flex justify-end pt-4">
+            <button type="submit" class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                <span id="submit-text">Confirmar Reserva</span>
+                <svg id="submit-spinner" class="hidden -mr-1 ml-2 h-4 w-4 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('reserva-form');
+    const repeticaoSelect = document.getElementById('id_res_repeticao');
+    const repeticaoFields = document.getElementById('repeticao-fields');
+    const semanalFields = document.getElementById('semanal-fields');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const submitText = document.getElementById('submit-text');
+    const submitSpinner = document.getElementById('submit-spinner');
+
+    // Mostrar/ocultar campos de repetição
+    function toggleRepeticaoFields() {
+        const showFields = repeticaoSelect.value !== 'N';
+        repeticaoFields.classList.toggle('hidden', !showFields);
+        
+        // Mostrar campos específicos para semanal
+        semanalFields.classList.toggle('hidden', repeticaoSelect.value !== 'S');
+    }
+
+    // Validar datas antes de enviar
+    form.addEventListener('submit', function(e) {
+        const inicio = new Date(document.getElementById('id_res_inicio').value);
+        const fim = new Date(document.getElementById('id_res_fim').value);
+        
+        if (fim <= inicio) {
+            alert('A data final deve ser posterior à data de início');
+            e.preventDefault();
+            return;
+        }
+
+        // Mostrar loading
+        submitText.textContent = 'Processando...';
+        submitSpinner.classList.remove('hidden');
+        submitBtn.disabled = true;
+    });
+
+    // Inicializar e observar mudanças
+    toggleRepeticaoFields();
+    repeticaoSelect.addEventListener('change', toggleRepeticaoFields);
+});
+</script>
+{% endblock %}

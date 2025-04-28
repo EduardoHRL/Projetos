@@ -68,28 +68,28 @@
                 {% csrf_token %}
                 
                 <div class="mb-3">
-                    <label for="nameInput" class="form-label">Nome</label>
-                    <input type="text" class="form-control" id="nameInput" name="nome" required>
+                    <label for="nameInput" class="form-label">Nome Completo</label>
+                    <input type="text" placeholder="Nome Completo" class="form-control" id="nameInput" name="nome" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="emailInput" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="emailInput" name="email" pattern="/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/" required>
+                    <input type="email" placeholder="Email" class="form-control" id="emailInput" name="email" pattern="/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="cpfInput" class="form-label">CPF</label>
-                    <input type="text" class="form-control" id="cpfInput" name="cpf" required>
+                    <input type="text" placeholder="CPF" class="form-control" id="cpfInput" name="cpf" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="telefoneInput" class="form-label">Telefone</label>
-                    <input type="text" class="form-control" id="telefoneInput" name="telefone" required>
+                    <input type="text" placeholder="Telefone" class="form-control" id="telefoneInput" name="telefone" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="passwordInput" class="form-label">Senha</label>
-                    <input type="password" class="form-control" id="passwordInput" name="senha" required>
+                    <input type="password" placeholder="Senha" class="form-control" id="passwordInput" name="senha" required>
                 </div>
 
                 <div class="mb-3">
@@ -107,7 +107,7 @@
                 <button type="submit" class="btn btn-primary w-100">Registrar-se</button>
             </form>
             <p></p>
-            <a class="btn btn-secondary w-100 py-2" href="{% url 'logar' %}">Voltar ao Login</a>
+            <a class="btn btn-secondary w-100 py-2" href="{% url 'login' %}">Voltar ao Login</a>
         </div>
     </div>
 

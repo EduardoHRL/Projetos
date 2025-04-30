@@ -35,10 +35,12 @@ urlpatterns = [
     path('reservas/reservar/', views.CriarReserva.as_view(), name='reservar'),
     path('reservas/atualizar/<int:res_codigo>/', views.AtualizarReserva.as_view(), name='atualizar_reserva'),
     path('reservas/excluir/<int:pk>/', views.ExcluirReserva.as_view(), name='excluir_reserva'),
+    path('historico/', views.historico_reservas, name='historico'),
+    path('historico/admin', views.historico_reservas_admin, name='historico_admin'),
 
     # Urls da escola
     path('escola/informações/', views.EscolaUpdateView.as_view(), name='escola'),
     path('buscar-cep/', views.buscar_cep, name='buscar-cep'),
-    path('escola/', views.EscolaListView.as_view(), name='informacoes_escola')
+    path('escola/', views.EscolaListView.as_view(), name='informacoes_escola'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

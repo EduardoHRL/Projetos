@@ -13,6 +13,7 @@ from django.views.decorators.http import require_GET, require_POST, require_http
 from django.views.decorators.cache import never_cache
 from django.utils.decorators import method_decorator
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 from .filters import *
 from django_filters.views import FilterView
 import requests
@@ -20,6 +21,18 @@ import requests
 def admin_check(user):
     return user.is_authenticated and (user.is_staff or user.is_superuser)
 admin_required = user_passes_test(admin_check)
+
+@login_required
+@never_cache
+def historico_reservas(request):
+    historicos = Reservas.history.select_related('laboratorio', 'professor').all().order_by('-history_date')
+    return render(request, 'reservas/historico.html', {'historico': historicos})
+
+@login_required
+@never_cache
+def historico_reservas_admin(request):
+    historicos = Reservas.history.select_related('laboratorio', 'professor').all().order_by('-history_date')
+    return render(request, 'historico.html', {'historico': historicos})
 
 @login_required
 @never_cache
@@ -196,7 +209,7 @@ class LaboratoriosListView(LoginRequiredMixin, FilterView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['reserva'] = Reservas.objects.all()
+        context['reserva'] = Reservas.objects.filter(professor=self.request.user, res_repeticao_original__isnull=True)
         return context
         
 @method_decorator(admin_required, name='dispatch')
@@ -327,15 +340,23 @@ class CriarReserva(LoginRequiredMixin, FormView):
         form.instance.professor = self.request.user
         reserva_base = form.save(commit=False)
 
-        if reserva_base.res_repeticao == "S":
-            return self._salvar_repeticoes(form, reserva_base)
+        tipo_repeticao = reserva_base.res_repeticao
+
+        if tipo_repeticao == "S":
+            return self._salvar_repeticoes_semanais(form, reserva_base)
+        elif tipo_repeticao == "D":
+            return self._salvar_repeticoes_diarias(form, reserva_base)
+        elif tipo_repeticao == "M":
+            return self._salvar_repeticoes_mensais(form, reserva_base)
+        elif tipo_repeticao == "A":
+            return self._salvar_repeticoes_anuais(form, reserva_base)
         else:
             reserva_base.laboratorio.lab_status = 'usando'
             reserva_base.laboratorio.save()
             reserva_base.save()
             return super().form_valid(form)
 
-    def _salvar_repeticoes(self, form, reserva_base):
+    def _salvar_repeticoes_semanais(self, form, reserva_base):
         inicio = reserva_base.res_inicio
         fim = reserva_base.res_fim
         dias_semana = form.cleaned_data["res_dia_semana"]
@@ -343,41 +364,105 @@ class CriarReserva(LoginRequiredMixin, FormView):
         data_limite = form.cleaned_data["res_data_final_repeticao"]
 
         reservas_criadas = []
-
         dias_semana = [int(dia) for dia in dias_semana]
         data_atual = inicio.date()
 
         while data_atual <= data_limite:
             for dia in dias_semana:
                 dia_reserva = self._proxima_data(data_atual, dia)
-
                 if dia_reserva > data_limite:
                     continue
-
                 dt_inicio = datetime.combine(dia_reserva, inicio.time())
                 dt_fim = datetime.combine(dia_reserva, fim.time())
-
                 reserva_base.laboratorio.lab_status = 'usando'
                 reserva_base.laboratorio.save()
-
-                nova_reserva = Reservas.objects.create(
+                Reservas.objects.create(
                     professor=self.request.user,
                     laboratorio=reserva_base.laboratorio,
                     res_inicio=dt_inicio,
                     res_fim=dt_fim,
                     res_repeticao='N',
                     res_descricao=reserva_base.res_descricao,
+                    res_repeticao_original=reserva_base
                 )
-                reservas_criadas.append(nova_reserva)
-
             data_atual += timedelta(weeks=intervalo)
+        return super().form_valid(form)
 
+    def _salvar_repeticoes_diarias(self, form, reserva_base):
+        inicio = reserva_base.res_inicio
+        fim = reserva_base.res_fim
+        data_limite = form.cleaned_data["res_data_final_repeticao"]
+        data_atual = inicio
+
+        while data_atual.date() <= data_limite:
+            dt_inicio = datetime.combine(data_atual.date(), inicio.time())
+            dt_fim = datetime.combine(data_atual.date(), fim.time())
+            reserva_base.laboratorio.lab_status = 'usando'
+            reserva_base.laboratorio.save()
+            Reservas.objects.create(
+                professor=self.request.user,
+                laboratorio=reserva_base.laboratorio,
+                res_inicio=dt_inicio,
+                res_fim=dt_fim,
+                res_repeticao='N',
+                res_descricao=reserva_base.res_descricao,
+                res_repeticao_original=reserva_base
+            )
+            data_atual += timedelta(days=1)
+        return super().form_valid(form)
+
+    def _salvar_repeticoes_mensais(self, form, reserva_base):
+        inicio = reserva_base.res_inicio
+        fim = reserva_base.res_fim
+        data_limite = form.cleaned_data["res_data_final_repeticao"]
+        data_atual = inicio
+
+        while data_atual.date() <= data_limite:
+            dt_inicio = datetime.combine(data_atual.date(), inicio.time())
+            dt_fim = datetime.combine(data_atual.date(), fim.time())
+            reserva_base.laboratorio.lab_status = 'usando'
+            reserva_base.laboratorio.save()
+            Reservas.objects.create(
+                professor=self.request.user,
+                laboratorio=reserva_base.laboratorio,
+                res_inicio=dt_inicio,
+                res_fim=dt_fim,
+                res_repeticao='N',
+                res_descricao=reserva_base.res_descricao,
+                res_repeticao_original=reserva_base
+            )
+            data_atual += relativedelta(months=1)
+        return super().form_valid(form)
+
+    def _salvar_repeticoes_anuais(self, form, reserva_base):
+        inicio = reserva_base.res_inicio
+        fim = reserva_base.res_fim
+        data_limite = form.cleaned_data["res_data_final_repeticao"]
+        data_atual = inicio
+
+        while data_atual.date() <= data_limite:
+            dt_inicio = datetime.combine(data_atual.date(), inicio.time())
+            dt_fim = datetime.combine(data_atual.date(), fim.time())
+            reserva_base.laboratorio.lab_status = 'usando'
+            reserva_base.laboratorio.save()
+            Reservas.objects.create(
+                professor=self.request.user,
+                laboratorio=reserva_base.laboratorio,
+                res_inicio=dt_inicio,
+                res_fim=dt_fim,
+                res_repeticao='N',
+                res_descricao=reserva_base.res_descricao,
+                res_repeticao_original=reserva_base
+            )
+            data_atual += relativedelta(years=1)
         return super().form_valid(form)
 
     def _proxima_data(self, data_base, dia_semana):
         dias_ate_dia = (dia_semana - data_base.weekday() + 7) % 7
         return data_base + timedelta(days=dias_ate_dia)
 
+
+@method_decorator(never_cache, name='dispatch')
 class AtualizarReserva(LoginRequiredMixin, UpdateView):
     template_name = 'reservas/atualizar.html'
     model = Reservas
@@ -385,10 +470,135 @@ class AtualizarReserva(LoginRequiredMixin, UpdateView):
     form_class = AtualizarReservasForm
     pk_url_kwarg = 'res_codigo'
 
+    def form_valid(self, form):
+        form.instance.professor = self.request.user
+        reserva_base = form.save(commit=False)
+        tipo_repeticao = reserva_base.res_repeticao
+
+        if tipo_repeticao == "S":
+            return self._salvar_repeticoes_semanais(form, reserva_base)
+        elif tipo_repeticao == "D":
+            return self._salvar_repeticoes_diarias(form, reserva_base)
+        elif tipo_repeticao == "M":
+            return self._salvar_repeticoes_mensais(form, reserva_base)
+        elif tipo_repeticao == "A":
+            return self._salvar_repeticoes_anuais(form, reserva_base)
+        else:
+            reserva_base.laboratorio.lab_status = 'usando'
+            reserva_base.laboratorio.save()
+            reserva_base.save()
+            return super().form_valid(form)
+
+    def _salvar_repeticoes_semanais(self, form, reserva_base):
+        inicio = reserva_base.res_inicio
+        fim = reserva_base.res_fim
+        dias_semana = form.cleaned_data["res_dia_semana"]
+        intervalo = form.cleaned_data["res_intervalo_semanas"]
+        data_limite = form.cleaned_data["res_data_final_repeticao"]
+
+        reservas_criadas = []
+        dias_semana = [int(dia) for dia in dias_semana]
+        data_atual = inicio.date()
+
+        while data_atual <= data_limite:
+            for dia in dias_semana:
+                dia_reserva = self._proxima_data(data_atual, dia)
+                if dia_reserva > data_limite:
+                    continue
+                dt_inicio = datetime.combine(dia_reserva, inicio.time())
+                dt_fim = datetime.combine(dia_reserva, fim.time())
+                reserva_base.laboratorio.lab_status = 'usando'
+                reserva_base.laboratorio.save()
+                Reservas.objects.create(
+                    professor=self.request.user,
+                    laboratorio=reserva_base.laboratorio,
+                    res_inicio=dt_inicio,
+                    res_fim=dt_fim,
+                    res_repeticao='N',
+                    res_descricao=reserva_base.res_descricao,
+                    res_repeticao_original=reserva_base
+                )
+            data_atual += timedelta(weeks=intervalo)
+        return super().form_valid(form)
+
+    def _salvar_repeticoes_diarias(self, form, reserva_base):
+        inicio = reserva_base.res_inicio
+        fim = reserva_base.res_fim
+        data_limite = form.cleaned_data["res_data_final_repeticao"]
+        data_atual = inicio
+
+        while data_atual.date() <= data_limite:
+            dt_inicio = datetime.combine(data_atual.date(), inicio.time())
+            dt_fim = datetime.combine(data_atual.date(), fim.time())
+            reserva_base.laboratorio.lab_status = 'usando'
+            reserva_base.laboratorio.save()
+            Reservas.objects.create(
+                professor=self.request.user,
+                laboratorio=reserva_base.laboratorio,
+                res_inicio=dt_inicio,
+                res_fim=dt_fim,
+                res_repeticao='N',
+                res_descricao=reserva_base.res_descricao,
+                res_repeticao_original=reserva_base
+            )
+            data_atual += timedelta(days=1)
+        return super().form_valid(form)
+
+    def _salvar_repeticoes_mensais(self, form, reserva_base):
+        inicio = reserva_base.res_inicio
+        fim = reserva_base.res_fim
+        data_limite = form.cleaned_data["res_data_final_repeticao"]
+        data_atual = inicio
+
+        while data_atual.date() <= data_limite:
+            dt_inicio = datetime.combine(data_atual.date(), inicio.time())
+            dt_fim = datetime.combine(data_atual.date(), fim.time())
+            reserva_base.laboratorio.lab_status = 'usando'
+            reserva_base.laboratorio.save()
+            Reservas.objects.create(
+                professor=self.request.user,
+                laboratorio=reserva_base.laboratorio,
+                res_inicio=dt_inicio,
+                res_fim=dt_fim,
+                res_repeticao='N',
+                res_descricao=reserva_base.res_descricao,
+                res_repeticao_original=reserva_base
+            )
+            data_atual += relativedelta(months=1)
+        return super().form_valid(form)
+
+    def _salvar_repeticoes_anuais(self, form, reserva_base):
+        inicio = reserva_base.res_inicio
+        fim = reserva_base.res_fim
+        data_limite = form.cleaned_data["res_data_final_repeticao"]
+        data_atual = inicio
+
+        while data_atual.date() <= data_limite:
+            dt_inicio = datetime.combine(data_atual.date(), inicio.time())
+            dt_fim = datetime.combine(data_atual.date(), fim.time())
+            reserva_base.laboratorio.lab_status = 'usando'
+            reserva_base.laboratorio.save()
+            Reservas.objects.create(
+                professor=self.request.user,
+                laboratorio=reserva_base.laboratorio,
+                res_inicio=dt_inicio,
+                res_fim=dt_fim,
+                res_repeticao='N',
+                res_descricao=reserva_base.res_descricao,
+                res_repeticao_original=reserva_base
+            )
+            data_atual += relativedelta(years=1)
+        return super().form_valid(form)
+
+    def _proxima_data(self, data_base, dia_semana):
+        dias_ate_dia = (dia_semana - data_base.weekday() + 7) % 7
+        return data_base + timedelta(days=dias_ate_dia)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['laboratorios'] = Laboratorios.objects.all()
         return context
+
 
 class ExcluirReserva(LoginRequiredMixin, DeleteView):
     model = Reservas
@@ -450,4 +660,3 @@ class EscolaListView(LoginRequiredMixin, ListView):
     model = Escola
     context_object_name = 'escola'
 
-    

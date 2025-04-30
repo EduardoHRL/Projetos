@@ -2,7 +2,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from cpf_field.models import CPFField
 from multiselectfield import MultiSelectField
-from django.core.validators import FileExtensionValidator
+from django.core.validators import FileExtensionValidator, MinLengthValidator
+from simple_history.models import HistoricalRecords, HistoricForeignKey
 
 DIAS_SEMANA = [
     (0, 'Segunda'),
@@ -92,7 +93,11 @@ class Reservas(models.Model):
         Laboratorios, on_delete=models.CASCADE, related_name='laboratorio_reservas', db_column='lab_codigo_res'
     )
     professor = models.ForeignKey(Usuarios, on_delete=models.CASCADE, related_name='professor', db_column='professor_codigo_reserva')
+    res_repeticao_original = models.ForeignKey(
+        'self', null=True, blank=True, on_delete=models.CASCADE, related_name='repeticoes', db_column='res_repeticao_original'
+    )
 
+    history = HistoricalRecords()
     class Meta:
         db_table = 'tbl_reservas'
 

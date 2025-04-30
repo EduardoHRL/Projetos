@@ -28,20 +28,14 @@
                 <div id="dropdown"
                     class="hidden absolute right-0 top-16 mt-2 w-64 bg-white border rounded-lg shadow-lg z-10">
                     <ul class="py-2 text-gray-700">
-                        <div class="flex px-4 py-3 m-2 rounded-lg items-center gap-4 hover:bg-gray-300 transition-all">
-                            {% if inf_escola %}
-                                {% for e in inf_escola %}
-                                    <img src="{{ e.logo.url }}" class="inline-flex w-14 h-14 rounded-full object-contain p-1 shadow-md cursor-pointer" alt="Imagem da Escola">
-                                    <div class="text-medium truncate">
-                                        {{ e.nome }}
-                                    </div>
-                                {% empty %}
-                                    <p>Nenhuma escola cadastrada</p>
-                                {% endfor %}
-                            {% else %}
-                                <p>Variável inf_escola não existe no contexto</p>
+                        <a href="{% url 'informacoes_escola' %}" class="flex px-4 py-3 m-2 rounded-lg items-center gap-4 hover:bg-gray-300 transition-all">
+                            {% if escola_item %}
+                                <img src="{{ escola_item.logo.url }}" class="inline-flex w-14 h-14 rounded-full object-contain p-1 shadow-md cursor-pointer" alt="Imagem da Escola">
+                                <div class="text-medium truncate">
+                                    {{ escola_item.nome }}
+                                </div>
                             {% endif %}
-                        </div>
+                            </a>
                         <li><a href="#" class="block px-4 py-2 hover:bg-gray-200">Suporte</a></li>
                         <li><a href="#" class="block px-4 py-2 hover:bg-gray-200">Ajuda</a></li>
                         <li>
@@ -77,9 +71,9 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="flex items-center gap-2 p-3 rounded-lg cursor-pointer hover:bg-gray-700 hover:text-white transition-all">
+                        <a href="{% url 'historico' %}" class="flex items-center gap-2 p-3 rounded-lg cursor-pointer hover:bg-gray-700 hover:text-white transition-all">
                             <i data-lucide="clipboard" class="duration-700 transition-all"></i>
-                            <span class="flex-1 ms-2 whitespace-nowrap">Relatórios</span>
+                            <span class="flex-1 ms-2 whitespace-nowrap">Histórico</span>
                         </a>
                     </li>
                     {% if user.is_superuser %}
@@ -100,7 +94,7 @@
                                     <a href="{% url 'lista_usuarios' %}">Professores</a>
                                 </li>
                                 <li>
-                                    <a href=""></a>
+                                    <a href="{% url 'historico_admin' %}">Histórico de Uso</a>
                                 </li>
                             </ul>
                         </li>

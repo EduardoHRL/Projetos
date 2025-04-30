@@ -85,7 +85,7 @@
         </div>
 
         <div class="w-full flex justify-center mt-8">
-            <button type="submit"
+            <button type="submit" id="btns"
                 class="flex items-center gap-3 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-300 ease-in-out transform hover:scale-105">
                 <i data-lucide="check"></i>
                 <span>Salvar</span>
@@ -94,7 +94,6 @@
     </form>
 </div>
 
-<!-- Modal da Imagem Expandida -->
 <div id="imageModal" class="fixed inset-0 bg-opacity-75 flex items-center justify-center z-50 hidden backdrop-blur-sm">
     <div class="relative bg-white p-4 rounded-lg shadow-xl">
         <img id="modalImage" class="max-w-[90vw] max-h-[90vh] rounded-lg shadow-md" />
@@ -160,6 +159,9 @@
         const cep = this.value.replace(/\D/g, '');
         if (cep.length === 8) {
             await buscarCEP(this);
+        }
+        else if (cep.length < 8){
+            document.getElementById('#btns').classList.add('hidden')
         }
     });
 

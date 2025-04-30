@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'crispy_tailwind',
     'widget_tweaks',
     'django_filters',
+    'simple_history',
 
 ]
 
@@ -58,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'website.middleware.NavigationControlMiddleware',
+    'simple_history.middleware.HistoryRequestMiddleware',
 ]
 
 ROOT_URLCONF = 'tcc.urls'
@@ -73,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'website.context_processors.escola_info',
             ],
         },
     },
@@ -86,14 +89,18 @@ WSGI_APPLICATION = 'tcc.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'db_tcc',
-        'USER': 'root',
-        'PASSWORD': 'senha123',
-        'HOST': 'localhost',
-        'PORT': '3306'
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres.njmwyxcbttphwzbotsph',
+        'PASSWORD': 'BdNyZBhQeCD04gzW',
+        'HOST': 'aws-0-sa-east-1.pooler.supabase.com',
+        'PORT': '5432',
+        'OPTIONS': {'sslmode': 'require'},
     }
 }
+
+
+
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',

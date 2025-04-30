@@ -220,6 +220,7 @@
                     <tr class="bg-gray-100 text-gray-700 text-left">
                         <th class="p-3 border border-gray-300">Laboratório</th>
                         <th class="p-3 border border-gray-300">Descrição</th>
+                        <th class="p-3 border border-gray-300">Período</th>
                         <th class="p-3 border border-gray-300  m-auto w-40">Ações</th>
                     </tr>
                 </thead>
@@ -229,6 +230,16 @@
                             <tr class="border border-gray-200 hover:bg-gray-50 transition">
                                 <td class="p-3 border border-gray-300">{{ r.laboratorio.lab_nome }}</td>
                                 <td class="p-3 border border-gray-300">{{ r.res_descricao }}</td>
+                                <td class="p-3 border border-gray-300 text-sm text-gray-700">
+                                    <div>
+                                        <strong>Início:</strong> {{ r.res_inicio|date:"d/m/Y H:i" }} <strong class="ml-2">Fim:</strong>{{ r.res_fim|date:'d/m/Y H:i' }} <br>
+                                        {% if r.res_data_final_repeticao %}
+                                            <strong>Até o dia:</strong> {{ r.res_data_final_repeticao|date:"d/m/Y" }}
+                                        {% else %}
+                                            <strong>Tipo:</strong> Reserva única
+                                        {% endif %}
+                                    </div>
+                                </td>
                                 <td class="p-3 border border-gray-300">
                                     <div class="flex gap-2">
                                         <a href="{% url 'atualizar_reserva' r.res_codigo %}" class="inline-flex items-center gap-1 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1.5 rounded-lg text-xs transition">

@@ -204,6 +204,7 @@ class EscolaForm(forms.ModelForm):
                 'x-model': 'cep',
                 '@input': 'formatarCep($event.target)',
                 '@blur': 'buscarCep($event.target)',
+                'minlength': '9',
                 'maxlength': '9',
                 'placeholder': '00000-000'
             }),

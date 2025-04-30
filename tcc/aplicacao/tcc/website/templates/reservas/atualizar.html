@@ -108,4 +108,30 @@
         </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const repeticaoSelect = document.getElementById("id_res_repeticao");
+        const repeticaoFields = document.getElementById("repeticao-fields");
+        const semanalFields = document.getElementById("semanal-fields");
+
+        function toggleRepeticaoFields() {
+            const value = repeticaoSelect.value;
+
+            if (value === 'S') {
+                repeticaoFields.classList.remove("hidden");
+                semanalFields.classList.remove("hidden");
+            } else if (value === 'D' || value === 'M' || value === 'A') {
+                repeticaoFields.classList.remove("hidden");
+                semanalFields.classList.add("hidden");
+            } else {
+                repeticaoFields.classList.add("hidden");
+                semanalFields.classList.add("hidden");
+            }
+        }
+
+        toggleRepeticaoFields();
+        repeticaoSelect.addEventListener("change", toggleRepeticaoFields);
+    });
+</script>
 {% endblock %}

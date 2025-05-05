@@ -16,7 +16,7 @@
 
             <div class="relative">
                 <img id="image-preview" src="{% if form.logo.value %}{{ form.logo.value.url }}{% else %}{% static 'sem_foto.jpeg' %}{% endif %}"
-                    alt="{% if form.logo.value %}Foto da escola{% else %}Sem foto{% endif %}"
+                    alt=""
                     class="w-56 h-56 border-4 border-gray-200 rounded-full object-contain cursor-pointer transform transition duration-300 ease-in-out hover:scale-105"
                     data-full-image="{% if form.logo.value %}{{ form.logo.value.url }}{% else %}{% static 'sem_foto.jpeg' %}{% endif %}" onclick="expandImage('{{ form.logo.value.url }}')">
                 <label for="id_logo"

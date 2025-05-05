@@ -25,13 +25,17 @@ admin_required = user_passes_test(admin_check)
 @login_required
 @never_cache
 def historico_reservas(request):
-    historicos = Reservas.history.select_related('laboratorio', 'professor').all().order_by('-history_date')
+    historicos = Reservas.history.select_related('laboratorio', 'professor')\
+        .filter(res_repeticao_original__isnull=True)\
+        .order_by('-history_date')
     return render(request, 'reservas/historico.html', {'historico': historicos})
 
 @login_required
 @never_cache
 def historico_reservas_admin(request):
-    historicos = Reservas.history.select_related('laboratorio', 'professor').all().order_by('-history_date')
+    historicos = Reservas.history.select_related('laboratorio', 'professor')\
+        .filter(res_repeticao_original__isnull=True)\
+        .order_by('-history_date')
     return render(request, 'historico.html', {'historico': historicos})
 
 @login_required
@@ -47,17 +51,25 @@ def agenda(request):
 
 @require_GET
 def reservas_json(request):
-    todas_reservas = Reservas.objects.all()
+    todas_reservas = Reservas.objects.select_related('laboratorio', 'professor').all()
     out = []
+
     for reserva in todas_reservas:
+        inicio = reserva.res_inicio
+        fim = reserva.res_fim
+
+        if (fim - inicio).days >= 1:
+            fim = inicio + timedelta(hours=(reserva.res_fim - reserva.res_inicio).seconds // 3600)
+
         out.append({
             'title': reserva.laboratorio.lab_nome,
-            'start': reserva.res_inicio.isoformat(),
-            'end': reserva.res_fim.isoformat(),
+            'start': inicio.isoformat(),
+            'end': fim.isoformat(),
             'responsavel': reserva.professor.username,
-            'motivo': reserva.res_descricao
+            'motivo': reserva.res_descricao,
+            'repetida': reserva.res_repeticao_original_id is not None
         })
-    
+
     return JsonResponse(out, safe=False)
 
 # Views de Login e Cadastro
@@ -96,8 +108,8 @@ def cadastro(request):
         email = request.POST.get('email')
         cpf = request.POST.get('cpf')
         telefone = request.POST.get('telefone')
-        tipoUsuario = request.POST.get('tipoUsuario')
         senha = request.POST.get('senha')
+        confirmarSenha = request.POST.get('confirmarSenha')
 
         if Usuarios.objects.filter(email=email).exists() or Usuarios.objects.filter(cpf=cpf).exists():
             if Usuarios.objects.filter(email=email).exists():
@@ -106,25 +118,20 @@ def cadastro(request):
                 messages.error(request, 'Cpf já existe.')
             return redirect('cadastro')
         
-        if tipoUsuario == 'admin':
-            usuarios = Usuarios.objects.create(
-                username = nome,
-                email = email,
-                cpf = cpf,
-                telefone = telefone,
-                is_superuser = True,
-                password = make_password(senha)
+        if senha != confirmarSenha:
+            messages.error(request, 'As duas senhas não coincidem.')
+            
+        
+        usuarios = Usuarios.objects.create(
+            username = nome,
+            email = email,
+            cpf = cpf,
+            telefone = telefone,
+            is_superuser = False,
+            is_staff = False,
+            is_active = False,
+            password = make_password(senha)
         )
-        elif tipoUsuario == 'usuario':
-                usuarios = Usuarios.objects.create(
-                username = nome,
-                email = email,
-                cpf = cpf,
-                telefone = telefone,
-                is_superuser = False,
-                password = make_password(senha),
-                is_active = False
-            )
         messages.success(request, 'Cadastro realizado com sucesso')
         return HttpResponseRedirect(reverse('login'))
 
@@ -222,7 +229,7 @@ class AdminLaboratoriosListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = LaboratoriosForm
-        context['reserva'] = Reservas.objects.all()
+        context['reserva'] = Reservas.objects.filter(res_repeticao_original__isnull=True)
         return context
     
 @method_decorator(admin_required, name='dispatch')
@@ -394,11 +401,14 @@ class CriarReserva(LoginRequiredMixin, FormView):
         data_limite = form.cleaned_data["res_data_final_repeticao"]
         data_atual = inicio
 
+        reserva_base.laboratorio.lab_status = 'usando'
+        reserva_base.laboratorio.save()
+        reserva_base.save()
+
         while data_atual.date() <= data_limite:
             dt_inicio = datetime.combine(data_atual.date(), inicio.time())
             dt_fim = datetime.combine(data_atual.date(), fim.time())
-            reserva_base.laboratorio.lab_status = 'usando'
-            reserva_base.laboratorio.save()
+
             Reservas.objects.create(
                 professor=self.request.user,
                 laboratorio=reserva_base.laboratorio,

@@ -45,6 +45,17 @@
             display: flex;
             gap: 8px;
         }
+
+        #esqueceu_a_senha {
+            text-decoration: none;
+        }
+        #esqueceu_a_senha:hover {
+            text-decoration: underline;
+        }
+        #div_senha {
+            display: flex;
+            gap: 91px;
+        }
     </style>
 </head>
 
@@ -79,7 +90,10 @@
 
                 <div class="mb-3 form-check">
                     <input class="form-check-input" type="checkbox" id="rememberMe" {% if request.COOKIES.rememberMe %}checked{% endif %}>
-                    <label class="form-check-label" for="rememberMe">Lembrar-me</label>
+                    <div id="div_senha">
+                        <label class="form-check-label" for="rememberMe">Lembrar-me</label>
+                        <a href="{% url 'password_reset' %}" id="esqueceu_a_senha">Esqueceu a senha?</a>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary w-100">Entrar</button>

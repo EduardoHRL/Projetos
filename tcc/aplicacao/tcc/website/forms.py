@@ -1,7 +1,6 @@
 from django import forms
 from .models import *
 from django.forms import inlineformset_factory
-from datetime import datetime
 from django.db.models import Q
 
 class LaboratoriosForm(forms.ModelForm):
@@ -222,4 +221,3 @@ class EscolaForm(forms.ModelForm):
             'horario_fim': 'Horário de fechamento',
             'endereco': 'Endereço'
         }
-

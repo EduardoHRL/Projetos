@@ -87,19 +87,37 @@ WSGI_APPLICATION = 'tcc.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'postgres',
+#         'USER': 'postgres.njmwyxcbttphwzbotsph',
+#         'PASSWORD': 'BdNyZBhQeCD04gzW',
+#         'HOST': 'aws-0-sa-east-1.pooler.supabase.com',
+#         'PORT': '5432',
+#         'OPTIONS': {'sslmode': 'require'},
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres.njmwyxcbttphwzbotsph',
-        'PASSWORD': 'BdNyZBhQeCD04gzW',
-        'HOST': 'aws-0-sa-east-1.pooler.supabase.com',
-        'PORT': '5432',
-        'OPTIONS': {'sslmode': 'require'},
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'db_tcc',
+        'USER': 'root',
+        'PASSWORD': 'senha123',
+        'HOST': 'localhost',
+        'PORT': '3306'
     }
 }
 
-
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'eduardohrl18@gmail.com'
+EMAIL_HOST_PASSWORD = 'gxju ocmd nfrh goeb'
+DEFAULT_FROM_EMAIL = 'eduardohrl18@gmail.com'
+SITE_NAME = 'site tcc'
 
 
 AUTHENTICATION_BACKENDS = [
@@ -117,12 +135,12 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 6,
+        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
 

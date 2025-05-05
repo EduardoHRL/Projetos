@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -42,5 +43,14 @@ urlpatterns = [
     path('escola/informações/', views.EscolaUpdateView.as_view(), name='escola'),
     path('buscar-cep/', views.buscar_cep, name='buscar-cep'),
     path('escola/', views.EscolaListView.as_view(), name='informacoes_escola'),
+
+    # Urls de recuperação de senha
+    path('senha-reset/', auth_views.PasswordResetView.as_view(template_name='registration/password_reset_form.html',
+            email_template_name='registration/password_reset_email.txt',
+            subject_template_name='registration/password_reset_subject.txt'), name='password_reset'),
+            
+    path('senha-reset/enviado/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('senha-reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('senha-reset/feito/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

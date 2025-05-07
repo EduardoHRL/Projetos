@@ -7,7 +7,7 @@ class Tarefas(models.Model):
     nome_setor = models.CharField(max_length=100, blank=True, null=True)
     prioridade = models.CharField(max_length=45, blank=True, null=True)
     data_cadastro = models.DateField(auto_now_add=True)
-    status = models.CharField(max_length=45, blank=True, null=True)
+    status = models.CharField(max_length=45, blank=True, null=True, default='A fazer')
     usuarios = models.ForeignKey('Usuarios',on_delete=models.CASCADE , db_column='Usuarios_id')
 
     class Meta:

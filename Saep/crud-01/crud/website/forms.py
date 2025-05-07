@@ -12,8 +12,17 @@ class UsuariosForm(forms.ModelForm):
         ]
 
 class TarefasForm(forms.ModelForm):
+    prioridade_escolha = [
+        ('baixa', 'Baixa'),
+        ('media', 'Média'),
+        ('alta', 'Alta')
+    ]
+
     descricao = forms.CharField(label='Descrição', required=True,
                                 widget=forms.TextInput(attrs={'class': 'resize-none'}))
+    
+    prioridade = forms.ChoiceField(label='Prioridade', required=True,
+                                   widget=forms.Select(), choices=prioridade_escolha)
     class Meta:
         model = Tarefas
         

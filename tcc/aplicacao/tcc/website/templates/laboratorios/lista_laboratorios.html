@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     data.horarios.forEach(horario => {
                         const li = document.createElement('li');
-                        li.textContent = `${horario.inicio} - ${horario.fim}`;
+                        li.textContent = `${horario.dias_formatados}: ${horario.inicio} - ${horario.fim}`;
                         horariosList.appendChild(li);
                     });
                     if (labStatus === 'disponivel') {
@@ -451,6 +451,8 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(error => {
                 console.error('Erro ao buscar horários disponíveis:', error);
+                const horariosList = document.querySelector('#expanded-card ul');
+                horariosList.innerHTML = '<li><em>Erro ao carregar horários</em></li>';
             });
 
         const cardPos = getCardPosition(card);

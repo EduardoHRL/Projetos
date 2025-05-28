@@ -16,6 +16,7 @@ DIAS_SEMANA = [
     (6, 'Domingo'),
 ]
 
+
 class CustomUserManager(BaseUserManager):
     use_in_migrations = True
 
@@ -159,8 +160,6 @@ class Disponibilidade(models.Model):
         return f"{self.hor_inicio.strftime('%H:%M')} - {self.hor_fim.strftime('%H:%M')}"
 
     def get_dias_semana_list(self):
-        if not self.hor_diasDisponiveis:
-            return []
         return self.hor_diasDisponiveis.split(',')
 
 class Escola(models.Model):

@@ -38,3 +38,4 @@ def laboratorio_nome(lab_id):
         return Laboratorios.objects.get(lab_codigo=lab_id).lab_nome
     except Laboratorios.DoesNotExist:
         return ""
+    

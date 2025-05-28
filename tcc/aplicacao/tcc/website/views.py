@@ -325,8 +325,14 @@ class LaboratoriosListView(LoginRequiredMixin, FilterView):
 
         horarios = Disponibilidade.objects.all()
         for horario in horarios:
-            dias_disponiveis = [DIAS_SEMANA[d] for d in horario.hor_diasDisponiveis.split(",")]
-            horario.dias_formatados = ", ".join(dias_disponiveis)
+            if horario.hor_diasDisponiveis:  # Verifica se não é None ou vazio
+                try:
+                    dias_disponiveis = [DIAS_SEMANA[d] for d in horario.hor_diasDisponiveis.split(",") if d in DIAS_SEMANA]
+                    horario.dias_formatados = ", ".join(dias_disponiveis) if dias_disponiveis else "Sem dias especificados"
+                except KeyError as e:
+                    horario.dias_formatados = "Erro: Dias inválidos"
+            else:
+                horario.dias_formatados = "Sem dias especificados"
 
         context['horarios'] = horarios
 
@@ -526,23 +532,16 @@ def verificar_disponibilidade(request, lab_codigo):
 def horarios_disponiveis(request, lab_codigo):
     data = request.GET.get('data')
     try:
-        data_obj = datetime.strptime(data, '%Y-%m-%d').date() if data else datetime.now().date()
-        dia_semana = str((data_obj.weekday() + 6) % 7)  # 0=segunda, 6=domingo
-
         laboratorio = get_object_or_404(Laboratorios, lab_codigo=lab_codigo)
         disponibilidades = Disponibilidade.objects.filter(laboratorio=laboratorio)
 
         reservas = Reservas.objects.filter(
             laboratorio=laboratorio,
-            res_inicio__date=data_obj
+            res_inicio__date=data if data else datetime.now().date()
         )
 
         horarios = []
         for disp in disponibilidades:
-            # Verificar se o dia da semana é permitido
-            if disp.hor_diasDisponiveis and dia_semana not in disp.hor_diasDisponiveis.split(','):
-                continue
-
             horario_conflita = False
             for reserva in reservas:
                 if (reserva.res_inicio.time() < disp.hor_fim and
@@ -550,40 +549,20 @@ def horarios_disponiveis(request, lab_codigo):
                     horario_conflita = True
                     break
             if not horario_conflita:
+                dias_disponiveis = []
+                if disp.hor_diasDisponiveis:
+                    dias_disponiveis = [DIAS_SEMANA.get(d, "Dia inválido") for d in disp.hor_diasDisponiveis.split(",") if d in DIAS_SEMANA]
                 horarios.append({
                     'inicio': disp.hor_inicio.strftime('%H:%M'),
-                    'fim': disp.hor_fim.strftime('%H:%M')
+                    'fim': disp.hor_fim.strftime('%H:%M'),
+                    'dias_formatados': ", ".join(dias_disponiveis) if dias_disponiveis else "Sem dias especificados"
                 })
 
         return JsonResponse({'horarios': horarios})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=400)
     
-def _todos_horarios_ocupados(self, laboratorio, data_reserva):
-    # Obter todos os horários disponíveis para o laboratório no dia da semana especificado
-    dia_semana = str((data_reserva.weekday() + 6) % 7)  # 0=segunda, 6=domingo
-    disponibilidades = Disponibilidade.objects.filter(
-        laboratorio=laboratorio,
-        hor_diasDisponiveis__contains=dia_semana
-    )
 
-    # Obter todas as reservas para o laboratório na data especificada
-    reservas = Reservas.objects.filter(
-        laboratorio=laboratorio,
-        res_inicio__date=data_reserva
-    )
-
-    # Verificar se cada horário disponível está coberto por uma reserva
-    for disp in disponibilidades:
-        horario_livre = True
-        for reserva in reservas:
-            if (reserva.res_inicio.time() <= disp.hor_inicio and
-                reserva.res_fim.time() >= disp.hor_fim):
-                horario_livre = False
-                break
-        if horario_livre:
-            return False  # Há pelo menos um horário disponível
-    return True
         
 @method_decorator(never_cache, name='dispatch')
 class CriarReserva(LoginRequiredMixin, FormView):
@@ -615,30 +594,20 @@ class CriarReserva(LoginRequiredMixin, FormView):
             form.add_error('res_data', "Data inválida")
             return self.form_invalid(form)
 
-        # Calcular o dia da semana (0=segunda, 6=domingo)
-        dia_semana = str(data_reserva.weekday())
-        dia_semana_str = str(dia_semana)
-        print(f"Data: {res_data}, Dia da semana (backend): {dia_semana} ({DIAS_SEMANA[dia_semana_str]})")
-
         reservas_criadas = []
 
         for hora_inicio in horarios_selecionados:
+            # Remova a verificação de dias da semana aqui
             disponibilidade = Disponibilidade.objects.filter(
                 laboratorio=laboratorio,
                 hor_inicio=hora_inicio
             ).first()
+            
             if not disponibilidade:
                 form.add_error(None, f"Horário {hora_inicio} não encontrado para o laboratório")
                 continue
 
-            dias_disponiveis = disponibilidade.hor_diasDisponiveis.split(',') if disponibilidade.hor_diasDisponiveis else []
-            print(f"Horário: {hora_inicio} - {disponibilidade.hor_fim}, Dias disponíveis: {dias_disponiveis}")
-            if dias_disponiveis and dia_semana_str not in dias_disponiveis:
-                form.add_error(None, f"O horário {hora_inicio} - {disponibilidade.hor_fim} não está disponível no dia {DIAS_SEMANA[dia_semana_str]}")
-                continue
-
-            # Ajustar o formato do horário para corresponder ao banco de dados
-            inicio_str = f"{res_data} {hora_inicio}:00"  # Garante segundos
+            inicio_str = f"{res_data} {hora_inicio}:00"
             fim_str = f"{res_data} {disponibilidade.hor_fim.strftime('%H:%M:%S')}"
             try:
                 res_inicio = timezone.make_aware(
@@ -669,10 +638,12 @@ class CriarReserva(LoginRequiredMixin, FormView):
                 form.add_error(None, f"O horário {hora_inicio} - {disponibilidade.hor_fim} conflita com outra reserva")
                 continue
 
-            reserva_base.laboratorio.lab_status = 'usando'
-            reserva_base.laboratorio.save()
             reserva_base.save()
             reservas_criadas.append(reserva_base)
+
+            # Atualizar status do laboratório
+            laboratorio.lab_status = 'usando'
+            laboratorio.save()
 
             if reserva_base.res_repeticao == 'S':
                 self._salvar_repeticoes_semanais(form, reserva_base)
@@ -682,27 +653,45 @@ class CriarReserva(LoginRequiredMixin, FormView):
             return self.form_invalid(form)
 
         return super().form_valid(form)
+    
+    def _todos_horarios_ocupados(self, laboratorio, data_reserva):
+    # Obter todos os horários disponíveis para o laboratório no dia da semana especificado
+        dia_semana = str(data_reserva.weekday())  # 0=segunda, 6=domingo
+        disponibilidades = Disponibilidade.objects.filter(
+            laboratorio=laboratorio,
+            hor_diasDisponiveis__contains=dia_semana
+        )
 
-    def _horario_disponivel(self, reserva, data_reserva):
+        # Obter todas as reservas para o laboratório na data especificada
+        reservas = Reservas.objects.filter(
+            laboratorio=laboratorio,
+            res_inicio__date=data_reserva
+        )
+
+        # Verificar se cada horário disponível está coberto por uma reserva
+        for disp in disponibilidades:
+            horario_livre = True
+            for reserva in reservas:
+                if (reserva.res_inicio.time() <= disp.hor_inicio and
+                    reserva.res_fim.time() >= disp.hor_fim):
+                    horario_livre = False
+                    break
+            if horario_livre:
+                return False  # Há pelo menos um horário disponível
+        return True
+
+    def _horario_disponivel(self, reserva, data_reserva=None):
         hora_inicio = reserva.res_inicio.time()
         hora_fim = reserva.res_fim.time()
-        dia_semana = str(data_reserva.weekday())
 
-        # Verificar se o horário está dentro de um período de disponibilidade
+        # Verificar apenas se há disponibilidade para o horário, sem considerar o dia da semana
         disponibilidades = Disponibilidade.objects.filter(
             laboratorio=reserva.laboratorio,
             hor_inicio__lte=hora_inicio,
             hor_fim__gte=hora_fim
         )
 
-        # Validar dia da semana
-        disponibilidade_valida = False
-        for disp in disponibilidades:
-            if not disp.hor_diasDisponiveis or dia_semana in disp.hor_diasDisponiveis.split(','):
-                disponibilidade_valida = True
-                break
-
-        if not disponibilidades.exists() or not disponibilidade_valida:
+        if not disponibilidades.exists():
             return False
 
         # Verificar conflitos com outras reservas
@@ -859,12 +848,11 @@ class CriarReserva(LoginRequiredMixin, FormView):
     def _proxima_data_anual(self, data):
         return data.replace(year=data.year + 1)
 
-
 @method_decorator(never_cache, name='dispatch')
 class AtualizarReserva(LoginRequiredMixin, UpdateView):
     template_name = 'reservas/atualizar.html'
     model = Reservas
-    form_class = ReservasForm
+    form_class = AtualizarReservasForm
     success_url = reverse_lazy('lista_laboratorios')
 
     def get_context_data(self, **kwargs):
@@ -893,11 +881,9 @@ class AtualizarReserva(LoginRequiredMixin, UpdateView):
             form.add_error('res_data', "Data inválida")
             return self.form_invalid(form)
 
-        dia_semana = str((data_reserva.weekday() + 6) % 7)
-
         # Excluir repetições antigas
         Reservas.objects.filter(
-            res_repeticao_codigo=self.object.res_repeticao_codigo
+            res_repeticao_original=self.object
         ).exclude(pk=self.object.pk).delete()
 
         reservas_criadas = []
@@ -906,26 +892,26 @@ class AtualizarReserva(LoginRequiredMixin, UpdateView):
                 laboratorio=laboratorio,
                 hor_inicio=hora_inicio
             ).first()
+            
             if not disponibilidade:
                 form.add_error(None, f"Horário {hora_inicio} não disponível")
                 continue
 
-            # Validar dia da semana
-            if disponibilidade.hor_diasDisponiveis and dia_semana not in disponibilidade.hor_diasDisponiveis.split(','):
-                form.add_error(None, f"O horário {hora_inicio} - {disponibilidade.hor_fim} não está disponível no dia selecionado")
-                continue
-
-            # Criar ou atualizar reserva
             inicio_str = f"{res_data} {hora_inicio}:00"
-            fim_str = f"{res_data} {disponibilidade.hor_fim}:00"
-            res_inicio = timezone.make_aware(
-                datetime.strptime(inicio_str, '%Y-%m-%d %H:%M:%S'),
-                timezone.get_current_timezone()
-            )
-            res_fim = timezone.make_aware(
-                datetime.strptime(fim_str, '%Y-%m-%d %H:%M:%S'),
-                timezone.get_current_timezone()
-            )
+            fim_str = f"{res_data} {disponibilidade.hor_fim.strftime('%H:%M:%S')}"
+            
+            try:
+                res_inicio = timezone.make_aware(
+                    datetime.strptime(inicio_str, '%Y-%m-%d %H:%M:%S'),
+                    timezone.get_current_timezone()
+                )
+                res_fim = timezone.make_aware(
+                    datetime.strptime(fim_str, '%Y-%m-%d %H:%M:%S'),
+                    timezone.get_current_timezone()
+                )
+            except ValueError as e:
+                form.add_error(None, f"Erro no formato do horário: {str(e)}")
+                continue
 
             if horarios_selecionados.index(hora_inicio) == 0:
                 # Atualizar a reserva principal
@@ -948,22 +934,21 @@ class AtualizarReserva(LoginRequiredMixin, UpdateView):
                     res_intervalo_semanas=res_intervalo_semanas,
                     res_dia_semana=','.join(res_dia_semana) if res_dia_semana else None,
                     res_data_final_repeticao=res_data_final_repeticao,
-                    res_repeticao_codigo=self.object.res_repeticao_codigo
+                    res_repeticao_original=self.object
                 )
-
-                if not self._horario_disponivel(nova_reserva):
-                    form.add_error(None, f"O horário {hora_inicio} - {disponibilidade.hor_fim} não está disponível ou conflita com outra reserva")
-                    continue
-
                 nova_reserva.save()
                 reservas_criadas.append(nova_reserva)
 
-            if not self._horario_disponivel(self.object):
+            if not self._horario_disponivel(self.object if horarios_selecionados.index(hora_inicio) == 0 else nova_reserva):
                 form.add_error(None, f"O horário {hora_inicio} - {disponibilidade.hor_fim} não está disponível ou conflita com outra reserva")
                 return self.form_invalid(form)
 
-        self.object.laboratorio.lab_status = 'usando'
-        self.object.laboratorio.save()
+        # Atualizar status do laboratório
+        if self._todos_horarios_ocupados(laboratorio, data_reserva):
+            laboratorio.lab_status = 'usando'
+        else:
+            laboratorio.lab_status = 'disponivel'
+        laboratorio.save()
         self.object.save()
 
         # Processar repetições
@@ -976,28 +961,24 @@ class AtualizarReserva(LoginRequiredMixin, UpdateView):
         elif tipo_repeticao == 'A':
             self._salvar_repeticoes_anuais(form, self.object)
 
+        messages.success(self.request, 'Reserva atualizada com sucesso!')
         return super().form_valid(form)
 
-    def _horario_disponivel(self, reserva):
+    def _horario_disponivel(self, reserva, data_reserva=None):
         hora_inicio = reserva.res_inicio.time()
         hora_fim = reserva.res_fim.time()
-        dia_semana = str((reserva.res_inicio.weekday() + 6) % 7)
 
+        # Verificar disponibilidade no laboratório
         disponibilidades = Disponibilidade.objects.filter(
             laboratorio=reserva.laboratorio,
             hor_inicio__lte=hora_inicio,
             hor_fim__gte=hora_fim
         )
 
-        disponibilidade_valida = False
-        for disp in disponibilidades:
-            if not disp.hor_diasDisponiveis or dia_semana in disp.hor_diasDisponiveis.split(','):
-                disponibilidade_valida = True
-                break
-
-        if not disponibilidades.exists() or not disponibilidade_valida:
+        if not disponibilidades.exists():
             return False
 
+        # Verificar conflitos com outras reservas
         conflitos = Reservas.objects.filter(
             laboratorio=reserva.laboratorio,
             res_inicio__lt=reserva.res_fim,
@@ -1006,16 +987,35 @@ class AtualizarReserva(LoginRequiredMixin, UpdateView):
 
         return not conflitos.exists()
 
+    def _todos_horarios_ocupados(self, laboratorio, data_reserva):
+        dia_semana = str(data_reserva.weekday())
+        disponibilidades = Disponibilidade.objects.filter(
+            laboratorio=laboratorio,
+            hor_diasDisponiveis__contains=dia_semana
+        )
+
+        reservas = Reservas.objects.filter(
+            laboratorio=laboratorio,
+            res_inicio__date=data_reserva
+        )
+
+        for disp in disponibilidades:
+            horario_livre = True
+            for reserva in reservas:
+                if (reserva.res_inicio.time() <= disp.hor_inicio and
+                    reserva.res_fim.time() >= disp.hor_fim):
+                    horario_livre = False
+                    break
+            if horario_livre:
+                return False
+        return True
+
     def _salvar_repeticoes_semanais(self, form, reserva_base):
         inicio = reserva_base.res_inicio
         fim = reserva_base.res_fim
         dias_semana = form.cleaned_data["res_dia_semana"]
         intervalo = form.cleaned_data["res_intervalo_semanas"]
         data_limite = form.cleaned_data["res_data_final_repeticao"]
-
-        reserva_base.laboratorio.lab_status = 'usando'
-        reserva_base.laboratorio.save()
-        reserva_base.save()
 
         dias_semana = [int(dia) for dia in dias_semana]
         data_atual = inicio.date()
@@ -1025,6 +1025,7 @@ class AtualizarReserva(LoginRequiredMixin, UpdateView):
                 dia_reserva = self._proxima_data(data_atual, dia)
                 if dia_reserva > data_limite:
                     continue
+                
                 dt_inicio = datetime.combine(dia_reserva, inicio.time())
                 dt_fim = datetime.combine(dia_reserva, fim.time())
 
@@ -1033,139 +1034,143 @@ class AtualizarReserva(LoginRequiredMixin, UpdateView):
                     laboratorio=reserva_base.laboratorio,
                     res_inicio=dt_inicio,
                     res_fim=dt_fim,
-                    res_repeticao='S',
+                    res_repeticao='N',
                     res_descricao=reserva_base.res_descricao,
                     res_repeticao_original=reserva_base
                 )
+                
                 if self._horario_disponivel(nova_reserva):
-                    Reservas.objects.create(
-                        professor=self.request.user,
-                        laboratorio=reserva_base.laboratorio,
-                        res_inicio=dt_inicio,
-                        res_fim=dt_fim,
-                        res_repeticao='S',
-                        res_descricao=reserva_base.res_descricao,
-                        res_repeticao_original=reserva_base
-                    )
+                    nova_reserva.save()
+
             data_atual += timedelta(weeks=intervalo)
-        return super().form_valid(form)
 
     def _salvar_repeticoes_diarias(self, form, reserva_base):
         inicio = reserva_base.res_inicio
         fim = reserva_base.res_fim
         data_limite = form.cleaned_data["res_data_final_repeticao"]
 
-        reserva_base.laboratorio.lab_status = 'usando'
-        reserva_base.laboratorio.save()
-        reserva_base.save()
-
-        data_atual = inicio
-        while data_atual.date() <= data_limite:
-            dt_inicio = datetime.combine(data_atual.date(), inicio.time())
-            dt_fim = datetime.combine(data_atual.date(), fim.time())
+        data_atual = inicio.date() + timedelta(days=1)  # Começar no dia seguinte
+        while data_atual <= data_limite:
+            dt_inicio = datetime.combine(data_atual, inicio.time())
+            dt_fim = datetime.combine(data_atual, fim.time())
 
             nova_reserva = Reservas(
                 professor=self.request.user,
                 laboratorio=reserva_base.laboratorio,
                 res_inicio=dt_inicio,
                 res_fim=dt_fim,
-                res_repeticao='D',
+                res_repeticao='N',
                 res_descricao=reserva_base.res_descricao,
                 res_repeticao_original=reserva_base
             )
+            
             if self._horario_disponivel(nova_reserva):
-                Reservas.objects.create(
-                    professor=self.request.user,
-                    laboratorio=reserva_base.laboratorio,
-                    res_inicio=dt_inicio,
-                    res_fim=dt_fim,
-                    res_repeticao='D',
-                    res_descricao=reserva_base.res_descricao,
-                    res_repeticao_original=reserva_base
-                )
+                nova_reserva.save()
+
             data_atual += timedelta(days=1)
-        return super().form_valid(form)
 
     def _salvar_repeticoes_mensais(self, form, reserva_base):
         inicio = reserva_base.res_inicio
         fim = reserva_base.res_fim
         data_limite = form.cleaned_data["res_data_final_repeticao"]
 
-        reserva_base.laboratorio.lab_status = 'usando'
-        reserva_base.laboratorio.save()
-        reserva_base.save()
-
-        data_atual = inicio
-        while data_atual.date() <= data_limite:
-            dt_inicio = datetime.combine(data_atual.date(), inicio.time())
-            dt_fim = datetime.combine(data_atual.date(), fim.time())
+        data_atual = inicio.date() + relativedelta(months=1)  # Começar no mês seguinte
+        while data_atual <= data_limite:
+            dt_inicio = datetime.combine(data_atual, inicio.time())
+            dt_fim = datetime.combine(data_atual, fim.time())
 
             nova_reserva = Reservas(
                 professor=self.request.user,
                 laboratorio=reserva_base.laboratorio,
                 res_inicio=dt_inicio,
                 res_fim=dt_fim,
-                res_repeticao='M',
+                res_repeticao='N',
                 res_descricao=reserva_base.res_descricao,
                 res_repeticao_original=reserva_base
             )
+            
             if self._horario_disponivel(nova_reserva):
-                Reservas.objects.create(
-                    professor=self.request.user,
-                    laboratorio=reserva_base.laboratorio,
-                    res_inicio=dt_inicio,
-                    res_fim=dt_fim,
-                    res_repeticao='M',
-                    res_descricao=reserva_base.res_descricao,
-                    res_repeticao_original=reserva_base
-                )
+                nova_reserva.save()
+
             data_atual += relativedelta(months=1)
-        return super().form_valid(form)
 
     def _salvar_repeticoes_anuais(self, form, reserva_base):
         inicio = reserva_base.res_inicio
         fim = reserva_base.res_fim
         data_limite = form.cleaned_data["res_data_final_repeticao"]
 
-        reserva_base.laboratorio.lab_status = 'usando'
-        reserva_base.laboratorio.save()
-        reserva_base.save()
-
-        data_atual = inicio
-        while data_atual.date() <= data_limite:
-            dt_inicio = datetime.combine(data_atual.date(), inicio.time())
-            dt_fim = datetime.combine(data_atual.date(), fim.time())
+        data_atual = inicio.date() + relativedelta(years=1)  # Começar no ano seguinte
+        while data_atual <= data_limite:
+            dt_inicio = datetime.combine(data_atual, inicio.time())
+            dt_fim = datetime.combine(data_atual, fim.time())
 
             nova_reserva = Reservas(
                 professor=self.request.user,
                 laboratorio=reserva_base.laboratorio,
                 res_inicio=dt_inicio,
                 res_fim=dt_fim,
-                res_repeticao='A',
+                res_repeticao='N',
                 res_descricao=reserva_base.res_descricao,
                 res_repeticao_original=reserva_base
             )
+            
             if self._horario_disponivel(nova_reserva):
-                Reservas.objects.create(
-                    professor=self.request.user,
-                    laboratorio=reserva_base.laboratorio,
-                    res_inicio=dt_inicio,
-                    res_fim=dt_fim,
-                    res_repeticao='A',
-                    res_descricao=reserva_base.res_descricao,
-                    res_repeticao_original=reserva_base
-                )
+                nova_reserva.save()
+
             data_atual += relativedelta(years=1)
-        return super().form_valid(form)
 
     def _proxima_data(self, data_base, dia_semana):
-        dias_ate_dia = (dia_semana - data_base.weekday() + 7) % 7
+        """Retorna a próxima data a partir de data_base que corresponde ao dia_semana especificado"""
+        dias_ate_dia = (dia_semana - data_base.weekday()) % 7
+        if dias_ate_dia == 0:  # Se já é o mesmo dia, adiciona 7 dias
+            dias_ate_dia = 7
         return data_base + timedelta(days=dias_ate_dia)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['laboratorios'] = Laboratorios.objects.all()
-        return context
+    @require_GET
+    def verificar_disponibilidade(self, request, lab_codigo):
+        """Endpoint para verificar disponibilidade via AJAX"""
+        data = request.GET.get('data')
+        hora_inicio = request.GET.get('hora_inicio')
+        hora_fim = request.GET.get('hora_fim')
+        
+        try:
+            data_obj = datetime.strptime(data, '%Y-%m-%d').date()
+            inicio = datetime.strptime(f"{data} {hora_inicio}", '%Y-%m-%d %H:%M')
+            fim = datetime.strptime(f"{data} {hora_fim}", '%Y-%m-%d %H:%M')
+            
+            # Verifica se há horário disponível para o horário solicitado
+            disponivel = Disponibilidade.objects.filter(
+                laboratorio__lab_codigo=lab_codigo,
+                hor_inicio__lte=hora_inicio,
+                hor_fim__gte=hora_fim
+            ).exists()
+            
+            if not disponivel:
+                return JsonResponse({
+                    'disponivel': False,
+                    'mensagem': 'Horário fora do período disponível para este laboratório'
+                }, status=400)
+            
+            # Verifica conflitos com outras reservas
+            conflitos = Reservas.objects.filter(
+                laboratorio__lab_codigo=lab_codigo,
+                res_inicio__lt=fim,
+                res_fim__gt=inicio
+            ).exists()
+            
+            if conflitos:
+                return JsonResponse({
+                    'disponivel': False,
+                    'mensagem': 'Conflito com outra reserva existente'
+                }, status=400)
+            
+            return JsonResponse({
+                'disponivel': True,
+                'mensagem': 'Horário disponível'
+            })
+            
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
 
 
 class ExcluirReserva(LoginRequiredMixin, DeleteView):
@@ -1182,6 +1187,28 @@ class ExcluirReserva(LoginRequiredMixin, DeleteView):
 
         return super().delete(request, *args, **kwargs)
     
+    def todos_horarios_ocupados(laboratorio, data_reserva):
+        dia_semana = str(data_reserva.weekday())
+        disponibilidades = Disponibilidade.objects.filter(
+            laboratorio=laboratorio,
+            hor_diasDisponiveis__contains=dia_semana
+        )
+
+        reservas = Reservas.objects.filter(
+            laboratorio=laboratorio,
+            res_inicio__date=data_reserva
+        )
+
+        for disp in disponibilidades:
+            horario_livre = True
+            for reserva in reservas:
+                if (reserva.res_inicio.time() <= disp.hor_inicio and
+                    reserva.res_fim.time() >= disp.hor_fim):
+                    horario_livre = False
+                    break
+            if horario_livre:
+                return False
+        return True
 
 # Views da escola
 

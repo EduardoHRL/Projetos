@@ -34,7 +34,7 @@ urlpatterns = [
 
     # Urls das reservas
     path('reservas/reservar/<int:lab_codigo>/', views.CriarReserva.as_view(), name='reservar'),
-    path('reservas/atualizar/<int:res_codigo>/', views.AtualizarReserva.as_view(), name='atualizar_reserva'),
+    path('reservas/atualizar/<int:pk>/', views.AtualizarReserva.as_view(), name='atualizar_reserva'),
     path('reservas/excluir/<int:pk>/', views.ExcluirReserva.as_view(), name='excluir_reserva'),
     path('historico/', views.historico_reservas, name='historico'),
     path('historico/admin', views.historico_reservas_admin, name='historico_admin'),

@@ -141,26 +141,27 @@ class Disponibilidade(models.Model):
     hor_diasDisponiveis = models.CharField(
         max_length=13,
         db_column='hor_diasDisponiveis',
-        help_text="Dias disponíveis separados por vírgula (0=Segunda, 6=Domingo)"
+        blank=True,
+        null=True,
+        help_text="Dias da semana disponíveis (ex.: '0,1,2' para segunda, terça, quarta)"
     )
     laboratorio = models.ForeignKey(
-        Laboratorios, on_delete=models.CASCADE, related_name='disponibilidades', db_column='lab_codigo_hor'
+        'Laboratorios',
+        on_delete=models.CASCADE,
+        related_name='disponibilidades',
+        db_column='lab_codigo'
     )
 
     class Meta:
         db_table = 'tbl_horario_reserva'
 
-    def clean(self):
-        if not all(d.strip() in ('0','1','2','3','4','5','6') for d in self.hor_diasDisponiveis.split(',')):
-            raise ValidationError("Dias devem ser números de 0-6 separados por vírgula")
-        
-    def get_dias_semana_list(self):
-        """Retorna os dias disponíveis como lista"""
-        return self.hor_diasDisponiveis.split(',')
-
     def __str__(self):
-        dias = ", ".join([DIAS_SEMANA[int(d)][1] for d in self.hor_diasDisponiveis.split(",") if d.isdigit()])
-        return f"{dias} - {self.hor_inicio} até {self.hor_fim}"
+        return f"{self.hor_inicio.strftime('%H:%M')} - {self.hor_fim.strftime('%H:%M')}"
+
+    def get_dias_semana_list(self):
+        if not self.hor_diasDisponiveis:
+            return []
+        return self.hor_diasDisponiveis.split(',')
 
 class Escola(models.Model):
     nome = models.CharField(max_length=100)

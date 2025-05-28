@@ -1,7 +1,7 @@
 from django import template
 import json
 from django.template.defaultfilters import stringfilter
-from ..models import DIAS_SEMANA
+from ..models import DIAS_SEMANA, Laboratorios
 
 register = template.Library()
 
@@ -31,3 +31,10 @@ def split(value, arg):
 @register.filter
 def get_dia_nome(dia_num):
     return dict(DIAS_SEMANA).get(dia_num, '')
+
+@register.filter
+def laboratorio_nome(lab_id):
+    try:
+        return Laboratorios.objects.get(lab_codigo=lab_id).lab_nome
+    except Laboratorios.DoesNotExist:
+        return ""

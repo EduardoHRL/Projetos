@@ -44,7 +44,7 @@ class LaboratoriosForm(forms.ModelForm):
 
 HorarioLaboratorioFormset = modelformset_factory(
     Disponibilidade,
-    fields=('hor_diasDisponiveis','hor_inicio', 'hor_fim'),
+    fields=('hor_inicio', 'hor_fim', 'hor_diasDisponiveis'),
     extra=1,
 )
 
@@ -130,6 +130,8 @@ class ReservasForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['laboratorio'].queryset = Laboratorios.objects.filter(lab_status='disponivel')
+        self.fields['res_inicio'].required = False
+        self.fields['res_fim'].required    = False
 
 class AtualizarReservasForm(forms.ModelForm):
     res_dia_semana = forms.MultipleChoiceField(

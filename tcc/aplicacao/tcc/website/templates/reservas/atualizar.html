@@ -1,10 +1,30 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
 {% block title %}Atualizar Reserva{% endblock %}
+{% load custom_filters %}
 {% block content %}
 <div class="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-md">
     <h1 class="text-2xl font-bold text-gray-800 mb-6">Atualizar Reserva</h1>
     
+    <div class="mb-6 bg-blue-50 p-4 rounded-lg">
+        <h3 class="text-lg font-medium text-gray-800 mb-3">Horários Disponíveis para {{ form.laboratorio.value|laboratorio_nome }}</h3>
+        {% with horarios_disponiveis=form.laboratorio.queryset.first.disponibilidades.all %}
+            {% if horarios_disponiveis %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {% for horario in horarios_disponiveis %}
+                        <div class="border border-blue-200 bg-white rounded-lg p-3">
+                            <div class="font-medium text-blue-800">
+                                {{ horario.hor_inicio|time:"H:i" }} - {{ horario.hor_fim|time:"H:i" }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-sm text-gray-500">Nenhum horário disponível cadastrado para este laboratório</p>
+            {% endif %}
+        {% endwith %}
+    </div>
+
     <form method="post" class="space-y-6" id="reserva-form">
         {% csrf_token %}
         <div class="space-y-2">
@@ -18,26 +38,40 @@
             {% endif %}
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-2">
-                <label for="{{ form.res_inicio.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                    Data e Hora de Início <span class="text-red-500">*</span>
-                </label>
-                {% render_field form.res_inicio class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %}
-                {% if form.res_inicio.errors %}
-                    <div class="text-sm text-red-600">{{ form.res_inicio.errors }}</div>
-                {% endif %}
-            </div>
+        <div class="space-y-2">
+            <label for="res_data" class="block text-sm font-medium text-gray-700">
+                Data da Reserva <span class="text-red-500">*</span>
+            </label>
+            <input type="date" id="res_data" name="res_data" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                value="{{ object.res_inicio|date:'Y-m-d' }}"
+                required>
+        </div>
 
-            <div class="space-y-2">
-                <label for="{{ form.res_fim.id_for_label }}" class="block text-sm font-medium text-gray-700">
-                    Data e Hora de Término <span class="text-red-500">*</span>
-                </label>
-                {% render_field form.res_fim class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" %}
-                {% if form.res_fim.errors %}
-                    <div class="text-sm text-red-600">{{ form.res_fim.errors }}</div>
-                {% endif %}
-            </div>
+        <div class="mb-6 bg-blue-50 p-4 rounded-lg">
+            <h3 class="text-lg font-medium text-gray-800 mb-3">Horários Disponíveis para {{ form.laboratorio.value|laboratorio_nome }}</h3>
+            {% for horario in horarios_disponiveis %}
+                <div class="border border-blue-200 bg-white rounded-lg p-3 mb-2">
+                    <div class="font-medium text-blue-800">
+                        {{ horario.hor_inicio|time:"H:i" }} - {{ horario.hor_fim|time:"H:i" }}
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        Dias: 
+                        {% for dia in horario.get_dias_semana_list %}
+                            {% if dia == "0" %}Segunda{% endif %}
+                            {% if dia == "1" %}Terça{% endif %}
+                            {% if dia == "2" %}Quarta{% endif %}
+                            {% if dia == "3" %}Quinta{% endif %}
+                            {% if dia == "4" %}Sexta{% endif %}
+                            {% if dia == "5" %}Sábado{% endif %}
+                            {% if dia == "6" %}Domingo{% endif %}
+                            {% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-sm text-gray-500">Nenhum horário disponível cadastrado para este laboratório</p>
+            {% endfor %}
         </div>
 
         <div class="space-y-2">
@@ -110,74 +144,80 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const repeticaoSelect = document.getElementById("id_res_repeticao");
-        const repeticaoFields = document.getElementById("repeticao-fields");
-        const semanalFields = document.getElementById("semanal-fields");
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('reserva-form');
+    const dataField = document.getElementById('res_data');
+    const horaInicioCheckboxes = document.querySelectorAll('input[name="res_hora_inicio[]"]');
+    const laboratorioId = document.querySelector('input[name="laboratorio"]').value;
 
-        function toggleRepeticaoFields() {
-            const value = repeticaoSelect.value;
+    const today = new Date().toISOString().split('T')[0];
+    dataField.min = today;
 
-            if (value === 'S') {
-                repeticaoFields.classList.remove("hidden");
-                semanalFields.classList.remove("hidden");
-            } else if (value === 'D' || value === 'M' || value === 'A') {
-                repeticaoFields.classList.remove("hidden");
-                semanalFields.classList.add("hidden");
-            } else {
-                repeticaoFields.classList.add("hidden");
-                semanalFields.classList.add("hidden");
+    function verificarDisponibilidade(data, horaInicio, horaFim) {
+        fetch(`/verificar-disponibilidade/${laboratorioId}/?data=${data}&hora_inicio=${horaInicio}&hora_fim=${horaFim}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.disponivel) {
+                    alert(data.mensagem);
+                    horaInicioCheckboxes.forEach(cb => {
+                        if (cb.value === horaInicio) cb.checked = false;
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao verificar disponibilidade:', error);
+                alert('Erro ao verificar disponibilidade. Tente novamente.');
+            });
+    }
+
+    horaInicioCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.checked && dataField.value) {
+                const horaFim = this.getAttribute('data-horario-fim');
+                verificarDisponibilidade(dataField.value, this.value, horaFim);
             }
-        }
-
-        toggleRepeticaoFields();
-        repeticaoSelect.addEventListener("change", toggleRepeticaoFields);
+        });
     });
-</script>
 
-<script>
-    function validarDiaSemana() {
-    if (dataField.value && horaInicioField.value) {
-        const data = new Date(dataField.value);
-        const diaSemana = (data.getDay() + 6) % 7; 
-        const selectedOption = horaInicioField.options[horaInicioField.selectedIndex];
-        
-        if (!selectedOption) return true;
-        
-        const diasDisponiveis = selectedOption.getAttribute('data-dias-disponiveis');
-        if (!diasDisponiveis) return true;
-        
-        if (!diasDisponiveis.split(',').includes(diaSemana.toString())) {
-            alert('O dia selecionado não está disponível para este horário');
-            dataField.value = '';
-            horaInicioField.value = '';
-            resInicioHidden.value = '';
-            resFimHidden.value = '';
-            return false;
-        }
-        return true;
-    }
-    return true;
-}
-</script>
-
-<script>
-    function formatarDataParaExibicao(dataStr) {
-        if (!dataStr) return '';
-        const [datePart, timePart] = dataStr.split('T');
-        return `${datePart} ${timePart}`;
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const resInicioField = document.getElementById('id_res_inicio');
-        const resFimField = document.getElementById('id_res_fim');
-        
-        if (resInicioField && resInicioField.value) {
-            resInicioField.value = formatarDataParaExibicao(resInicioField.value);
-        }
-        if (resFimField && resFimField.value) {
-            resFimField.value = formatarDataParaExibicao(resFimField.value);
-        }
+    dataField.addEventListener('change', function() {
+        horaInicioCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                const horaFim = checkbox.getAttribute('data-horario-fim');
+                verificarDisponibilidade(dataField.value, checkbox.value, horaFim);
+            }
+        });
     });
+
+    form.addEventListener('submit', function(e) {
+        const checkedHorarios = Array.from(horaInicioCheckboxes).filter(cb => cb.checked);
+        if (!dataField.value || checkedHorarios.length === 0) {
+            alert('Por favor, selecione uma data válida e pelo menos um horário');
+            e.preventDefault();
+            return;
+        }
+
+        checkedHorarios.forEach(cb => {
+            const inicio = new Date(`${dataField.value}T${cb.value}`);
+            const fim = new Date(`${dataField.value}T${cb.getAttribute('data-horario-fim')}`);
+            if (fim <= inicio) {
+                alert(`O horário ${cb.value} - ${cb.getAttribute('data-horario-fim')} é inválido`);
+                e.preventDefault();
+            }
+        });
+    });
+
+    const repeticaoSelect = document.getElementById('id_res_repeticao');
+    const repeticaoFields = document.getElementById('repeticao-fields');
+    const semanalFields = document.getElementById('semanal-fields');
+
+    function toggleRepeticaoFields() {
+        const showFields = repeticaoSelect.value !== 'N';
+        repeticaoFields.classList.toggle('hidden', !showFields);
+        semanalFields.classList.toggle('hidden', repeticaoSelect.value !== 'S');
+    }
+
+    toggleRepeticaoFields();
+    repeticaoSelect.addEventListener('change', toggleRepeticaoFields);
+});
 </script>
 {% endblock %}

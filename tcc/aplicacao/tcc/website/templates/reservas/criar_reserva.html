@@ -4,6 +4,7 @@
 {% block title %}Nova Reserva{% endblock %}
 
 {% block content %}
+
 <div class="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-md">
     <h1 class="text-2xl font-bold text-gray-800 mb-6">Nova Reserva para {{ laboratorio.lab_nome }}</h1>
     
@@ -49,32 +50,31 @@
 
         <input type="hidden" name="laboratorio" value="{{ laboratorio.lab_codigo }}">
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-2">
-                <label for="res_data" class="block text-sm font-medium text-gray-700">
-                    Data da Reserva <span class="text-red-500">*</span>
-                </label>
-                <input type="date" id="res_data" name="res_data" 
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    required>
-            </div>
+        <div class="space-y-2">
+            <label for="res_data" class="block text-sm font-medium text-gray-700">
+                Data da Reserva <span class="text-red-500">*</span>
+            </label>
+            <input type="date" id="res_data" name="res_data" 
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                required>
+        </div>
 
-            <div class="space-y-2">
-                <label for="res_hora_inicio" class="block text-sm font-medium text-gray-700">
-                    Horário <span class="text-red-500">*</span>
-                </label>
-                <select id="res_hora_inicio" name="res_hora_inicio" 
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        required>
-                    <option value="">Selecione um horário</option>
-                    {% for horario in horarios_disponiveis %}
-                        <option value="{{ horario.hor_inicio|time:'H:i' }}" 
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700">
+                Horários <span class="text-red-500">*</span>
+            </label>
+            <div class="flex flex-col gap-2">
+                {% for horario in horarios_disponiveis %}
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" name="res_hora_inicio[]" value="{{ horario.hor_inicio|time:'H:i' }}"
+                            class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                             data-horario-fim="{{ horario.hor_fim|time:'H:i' }}"
                             data-dias-disponiveis="{{ horario.hor_diasDisponiveis|default:'' }}">
+                        <span class="ml-2 text-sm text-gray-700">
                             {{ horario.hor_inicio|time:"H:i" }} - {{ horario.hor_fim|time:"H:i" }}
-                        </option>
-                    {% endfor %}
-                </select>
+                        </span>
+                    </label>
+                {% endfor %}
             </div>
         </div>
 
@@ -144,8 +144,6 @@
                 </svg>
             </button>
         </div>
-        <input type="hidden" id="id_res_inicio" name="res_inicio" required>
-        <input type="hidden" id="id_res_fim" name="res_fim" required>
     </form>
 </div>
 
@@ -153,62 +151,52 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('reserva-form');
     const dataField = document.getElementById('res_data');
-    const horaInicioField = document.getElementById('res_hora_inicio');
-    const resInicioHidden = document.getElementById('id_res_inicio');
-    const resFimHidden = document.getElementById('id_res_fim');
+    const horaInicioCheckboxes = document.querySelectorAll('input[name="res_hora_inicio[]"]');
     const laboratorioId = document.querySelector('input[name="laboratorio"]').value;
 
     const today = new Date().toISOString().split('T')[0];
     dataField.min = today;
 
-    function atualizarCamposOcultos() {
-        if (dataField.value && horaInicioField.value) {
-            const selectedOption = horaInicioField.options[horaInicioField.selectedIndex];
-            const horarioFim = selectedOption.getAttribute('data-horario-fim');
-            
-            const dataInicioStr = `${dataField.value}T${horaInicioField.value}`;
-            const dataFimStr = `${dataField.value}T${horarioFim}`;
-            
-            resInicioHidden.value = dataInicioStr.replace('T', ' ');
-            resFimHidden.value = dataFimStr.replace('T', ' ');
-            
-            // Verificar disponibilidade via AJAX
-            verificarDisponibilidade(dataField.value, horaInicioField.value, horarioFim);
-        }
-    }
-
     function getDiaPythonFromJS(dateStr) {
+        if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+            console.error('Formato de data inválido:', dateStr);
+            return null;
+        }
         const [year, month, day] = dateStr.split('-').map(Number);
         const jsDay = new Date(year, month - 1, day).getDay();
-        return (jsDay + 6) % 7;
+        // Ajuste para converter do formato JS (0=Domingo) para Python (0=Segunda)
+        const pythonDay = (jsDay + 6) % 7;
+        console.log(`Data: ${dateStr}, JS Day: ${jsDay}, Python Day: ${pythonDay}`);
+        return pythonDay;
     }
 
     function validarDiaSemana() {
-        if (!dataField.value || !horaInicioField.value || horaInicioField.selectedIndex === 0) {
+        if (!dataField.value) {
+            console.log('Nenhuma data selecionada');
             return true;
         }
-        
         const diaPython = getDiaPythonFromJS(dataField.value);
-        const selectedOption = horaInicioField.options[horaInicioField.selectedIndex];
-        const diasDisponiveis = selectedOption.getAttribute('data-dias-disponiveis');
-        
-        console.log("Dia selecionado (Python):", diaPython);
-        console.log("Dias disponíveis:", diasDisponiveis);
-        
-        if (!diasDisponiveis) {
-            alert('Nenhum dia disponível configurado para este horário');
+        if (diaPython === null) {
+            console.log('Data inválida, ignorando validação');
             return false;
         }
-        
-        if (!diasDisponiveis.split(',').includes(diaPython.toString())) {
-            alert('O dia selecionado não está disponível para este horário');
-            dataField.value = '';
-            horaInicioField.value = '';
-            resInicioHidden.value = '';
-            resFimHidden.value = '';
-            return false;
-        }
-        return true;
+        const diasSemanaNomes = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+        const nomeDia = diasSemanaNomes[diaPython];
+        console.log(`Dia selecionado: ${dataField.value}, Dia da semana: ${diaPython} (${nomeDia})`);
+
+        let valid = true;
+        horaInicioCheckboxes.forEach(cb => {
+            if (cb.checked) {
+                const diasDisponiveis = cb.getAttribute('data-dias-disponiveis') || '';
+                console.log(`Horário: ${cb.value}, Dias disponíveis: ${diasDisponiveis}`);
+                if (diasDisponiveis && !diasDisponiveis.split(',').includes(diaPython.toString())) {
+                    alert(`O horário ${cb.value} - ${cb.getAttribute('data-horario-fim')} não está disponível no dia ${nomeDia}`);
+                    cb.checked = false;
+                    valid = false;
+                }
+            }
+        });
+        return valid;
     }
 
     function verificarDisponibilidade(data, horaInicio, horaFim) {
@@ -217,10 +205,9 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (!data.disponivel) {
                     alert(data.mensagem);
-                    dataField.value = '';
-                    horaInicioField.value = '';
-                    resInicioHidden.value = '';
-                    resFimHidden.value = '';
+                    horaInicioCheckboxes.forEach(cb => {
+                        if (cb.value === horaInicio) cb.checked = false;
+                    });
                 }
             })
             .catch(error => {
@@ -230,36 +217,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     dataField.addEventListener('change', function() {
-        const diaPython = getDiaPythonFromJS(dataField.value);
-        Array.from(horaInicioField.options).forEach(option => {
-            if (option.value) {
-                const diasDisponiveis = option.getAttribute('data-dias-disponiveis');
-                option.disabled = diasDisponiveis && !diasDisponiveis.split(',').includes(diaPython.toString());
-            }
-        });
         if (validarDiaSemana()) {
-            atualizarCamposOcultos();
+            horaInicioCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    const horaFim = checkbox.getAttribute('data-horario-fim');
+                    verificarDisponibilidade(dataField.value, checkbox.value, horaFim);
+                }
+            });
         }
     });
 
-    horaInicioField.addEventListener('change', function() {
-        if (dataField.value && validarDiaSemana()) {
-            atualizarCamposOcultos();
-        }
+    horaInicioCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            if (this.checked && dataField.value) {
+                if (validarDiaSemana()) {
+                    const horaFim = this.getAttribute('data-horario-fim');
+                    verificarDisponibilidade(dataField.value, this.value, horaFim);
+                } else {
+                    this.checked = false;
+                }
+            }
+        });
     });
 
     form.addEventListener('submit', function(e) {
-        if (!resInicioHidden.value || !resFimHidden.value) {
-            alert('Por favor, selecione uma data e horário válidos');
-            e.preventDefault();
-            return;
-        }
-
-        const inicio = new Date(resInicioHidden.value);
-        const fim = new Date(resFimHidden.value);
-        
-        if (fim <= inicio) {
-            alert('A data final deve ser posterior à data de início');
+        const checkedHorarios = Array.from(horaInicioCheckboxes).filter(cb => cb.checked);
+        if (!dataField.value || checkedHorarios.length === 0) {
+            alert('Por favor, selecione uma data e pelo menos um horário válido');
             e.preventDefault();
             return;
         }
@@ -268,6 +252,15 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             return;
         }
+
+        checkedHorarios.forEach(cb => {
+            const inicio = new Date(`${dataField.value}T${cb.value}`);
+            const fim = new Date(`${dataField.value}T${cb.getAttribute('data-horario-fim')}`);
+            if (fim <= inicio) {
+                alert(`O horário ${cb.value} - ${cb.getAttribute('data-horario-fim')} é inválido: a data final deve ser posterior à inicial`);
+                e.preventDefault();
+            }
+        });
     });
 
     const repeticaoSelect = document.getElementById('id_res_repeticao');

@@ -422,20 +422,35 @@ document.addEventListener('DOMContentLoaded', () => {
         fetch(`/api/laboratorios/${labId}/horarios-disponiveis/?data=${new Date().toISOString().split('T')[0]}`)
             .then(response => response.json())
             .then(data => {
+                const horariosList = document.querySelector('#expanded-card ul');
+                horariosList.innerHTML = '';
                 if (!data.horarios || data.horarios.length === 0) {
+                    const li = document.createElement('li');
+                    li.innerHTML = '<em>Nenhum horário disponível</em>';
+                    horariosList.appendChild(li);
                     modalReservaBtn.classList.add('hidden');
                     modalEmUsoBtn.classList.remove('hidden');
-                    modalEmUsoBtn.textContent = 'Nenhum horário disponível';
-                } else if (labStatus === 'disponivel') {
-                    modalReservaBtn.classList.remove('hidden');
-                    modalEmUsoBtn.classList.add('hidden');
-                } else if (labStatus === 'usando') {
-                    modalReservaBtn.classList.add('hidden');
-                    modalEmUsoBtn.classList.remove('hidden');
+                    modalEmUsoBtn.textContent = 'Não disponível hoje';
                 } else {
-                    modalReservaBtn.classList.add('hidden');
-                    modalEmUsoBtn.classList.add('hidden');
+                    data.horarios.forEach(horario => {
+                        const li = document.createElement('li');
+                        li.textContent = `${horario.inicio} - ${horario.fim}`;
+                        horariosList.appendChild(li);
+                    });
+                    if (labStatus === 'disponivel') {
+                        modalReservaBtn.classList.remove('hidden');
+                        modalEmUsoBtn.classList.add('hidden');
+                    } else if (labStatus === 'usando') {
+                        modalReservaBtn.classList.add('hidden');
+                        modalEmUsoBtn.classList.remove('hidden');
+                    } else {
+                        modalReservaBtn.classList.add('hidden');
+                        modalEmUsoBtn.classList.add('hidden');
+                    }
                 }
+            })
+            .catch(error => {
+                console.error('Erro ao buscar horários disponíveis:', error);
             });
 
         const cardPos = getCardPosition(card);

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block title %}Laboratórios{% endblock %}
 {% load static %}
+{% load custom_filters %}
 {% block content %}
 <div class="mb-2 flex items-center">
     <button onclick="openModalReservas()" class="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg flex items-center">Minhas reservas</button>
@@ -25,7 +26,7 @@
         {% for lab in laboratorios %}
             {% if lab.lab_status == 'disponivel' %}
                 <div class="card relative w-full bg-gray-800 border border-gray-700 rounded-lg shadow-sm cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-                    data-lab-id="{{ lab.id }}"
+                    data-lab-id="{{ lab.lab_codigo }}"
                     data-lab-nome="{{ lab.lab_nome }}"
                     data-lab-foto="{{ lab.lab_foto.url }}"
                     data-lab-equipamentos='[{% for eq in lab.laboratorioequipamento_set.all %}"{{ eq.equipamento.equip_nome|capfirst }} - {{ eq.quantidade }}"{% if not forloop.last %}, {% endif %}{% endfor %}]'
@@ -64,12 +65,13 @@
         {% for lab in laboratorios %}
             {% if lab.lab_status == 'usando' %}
                 <div class="card relative w-full bg-gray-800 border border-gray-700 rounded-lg shadow-sm cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-                    data-lab-id="{{ lab.id }}"
+                    data-lab-id="{{ lab.lab_codigo }}"
                     data-lab-nome="{{ lab.lab_nome }}"
                     data-lab-foto="{{ lab.lab_foto.url }}"
                     data-lab-equipamentos='[{% for eq in lab.laboratorioequipamento_set.all %}"{{ eq.equipamento.equip_nome|capfirst }} - {{ eq.quantidade }}"{% if not forloop.last %}, {% endif %}{% endfor %}]'
                     data-lab-capacidade="{{ lab.lab_capacidade }}"
-                    data-lab-status="{{ lab.lab_status }}">
+                    data-lab-status="{{ lab.lab_status }}"
+                    data-lab-professor='{{ professores_por_lab|get_item:lab.lab_codigo|default:"[]" }}'>
                     
                     {# Status badge #}
                     <div class="absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-semibold 
@@ -153,11 +155,14 @@
                             <i data-lucide="calendar-days" id="icone_calendario"></i>
                             <h3 class="font-semibold text-blue-800 mb-2">Horários Disponíveis</h3>
                         </div>
-                        <ul class="space-y-2">
-                            <li class="flex justify-between text-gray-700">
-                                <span>Segunda-feira</span>
-                                <span class="font-medium">14:00 - 18:00</span>
-                            </li>
+                        <ul class="list-disc ml-4 text-sm">
+                            {% for horario in horarios %}
+                                <li>
+                                    {{ horario.dias_formatados }}: {{ horario.hor_inicio }} - {{ horario.hor_fim }}
+                                </li>
+                            {% empty %}
+                                <li><em>Nenhum horário cadastrado</em></li>
+                            {% endfor %}
                         </ul>
                     </div>
                 </div>
@@ -178,21 +183,24 @@
                     <div class="p-4 bg-blue-50 rounded-lg">
                         <div class="flex gap-2">
                             <i data-lucide="users" id="icone_capacidade"></i>
-                            <h3 class="font-semibold text-blue-800 mb-2">Capacidade Total<h3 id="modal-capacidade"></h3>Pessoas</h3>
+                            <h3 class="font-semibold text-blue-800 mb-2">Capacidade Total</h3>-<h3 id="modal-capacidade"></h3><h3>Pessoas</h3>
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-4">
-                    <div class="p-4 bg-blue-50 rounded-lg">
+                    <div class="p-4 bg-green-50 rounded-lg">
                         <div class="flex gap-2">
-                            <i data-lucide="users" id="icone_capacidade"></i>
-                            <h3 class="font-semibold text-blue-800 mb-2">Capacidade Total<h3 id="modal-capacidade"></h3>Pessoas</h3>
+                            <i data-lucide="settings" id="icone_equipamentos"></i>
+                            <h3 class="font-semibold text-blue-800 mb-2">Reservado por</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-2 professor-wrapper">
+                            
                         </div>
                     </div>
                 </div>
             </div>
-            <a href="{% url 'reservar' %}" type="submit" id="modal-reserva-btn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2 hidden cursor-pointer">
+            <a href="#" type="submit" id="modal-reserva-btn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2 hidden cursor-pointer">
                 <i data-lucide="check"></i>
                 Reservar Agora
             </a>
@@ -358,6 +366,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const modalEmUsoBtn = document.getElementById('modal-em-uso-btn');
 
         const labStatus = card.getAttribute('data-lab-status');
+        const labId = card.getAttribute('data-lab-id');
+        modalReservaBtn.href = `/reservas/reservar/${labId}/`;
 
         if (labStatus === 'disponivel') {
             modalReservaBtn.classList.remove('hidden');
@@ -369,6 +379,31 @@ document.addEventListener('DOMContentLoaded', () => {
             modalReservaBtn.classList.add('hidden');
             modalEmUsoBtn.classList.add('hidden');
         }
+
+        const professorWrapper = expandedCard.querySelector('.professor-wrapper');
+        professorWrapper.innerHTML = '';
+
+        const professorData = card.getAttribute('data-lab-professor');
+        let professor = [];
+
+        if (professorData && professorData.trim() !== '') {
+            try {
+                professor = JSON.parse(professorData);
+                if (!Array.isArray(professor)) {
+                    professor = [professor]; // Garante que seja um array
+                }
+            } catch (e) {
+                console.error('Dados inválidos de professor:', professorData, e);
+                professor = [];
+            }
+        }
+
+        professor.forEach(p => {
+            const span = document.createElement('span');
+            span.className = 'px-3 py-1 bg-white rounded-full text-sm shadow-sm';
+            span.textContent = p;
+            professorWrapper.appendChild(span);
+        });
 
         // Preencher equipamentos
         const equipamentosWrapper = expandedCard.querySelector('.equipamentos-wrapper');
@@ -383,6 +418,25 @@ document.addEventListener('DOMContentLoaded', () => {
             span.textContent = eq;
             equipamentosWrapper.appendChild(span);
         });
+
+        fetch(`/api/laboratorios/${labId}/horarios-disponiveis/?data=${new Date().toISOString().split('T')[0]}`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.horarios || data.horarios.length === 0) {
+                    modalReservaBtn.classList.add('hidden');
+                    modalEmUsoBtn.classList.remove('hidden');
+                    modalEmUsoBtn.textContent = 'Nenhum horário disponível';
+                } else if (labStatus === 'disponivel') {
+                    modalReservaBtn.classList.remove('hidden');
+                    modalEmUsoBtn.classList.add('hidden');
+                } else if (labStatus === 'usando') {
+                    modalReservaBtn.classList.add('hidden');
+                    modalEmUsoBtn.classList.remove('hidden');
+                } else {
+                    modalReservaBtn.classList.add('hidden');
+                    modalEmUsoBtn.classList.add('hidden');
+                }
+            });
 
         const cardPos = getCardPosition(card);
         

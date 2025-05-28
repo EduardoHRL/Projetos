@@ -3,7 +3,7 @@
 {% block title %}Atualizar Reserva{% endblock %}
 {% block content %}
 <div class="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow-md">
-    <h1 class="text-2xl font-bold text-gray-800 mb-6">Nova Reserva</h1>
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Atualizar Reserva</h1>
     
     <form method="post" class="space-y-6" id="reserva-form">
         {% csrf_token %}
@@ -132,6 +132,52 @@
 
         toggleRepeticaoFields();
         repeticaoSelect.addEventListener("change", toggleRepeticaoFields);
+    });
+</script>
+
+<script>
+    function validarDiaSemana() {
+    if (dataField.value && horaInicioField.value) {
+        const data = new Date(dataField.value);
+        const diaSemana = (data.getDay() + 6) % 7; 
+        const selectedOption = horaInicioField.options[horaInicioField.selectedIndex];
+        
+        if (!selectedOption) return true;
+        
+        const diasDisponiveis = selectedOption.getAttribute('data-dias-disponiveis');
+        if (!diasDisponiveis) return true;
+        
+        if (!diasDisponiveis.split(',').includes(diaSemana.toString())) {
+            alert('O dia selecionado não está disponível para este horário');
+            dataField.value = '';
+            horaInicioField.value = '';
+            resInicioHidden.value = '';
+            resFimHidden.value = '';
+            return false;
+        }
+        return true;
+    }
+    return true;
+}
+</script>
+
+<script>
+    function formatarDataParaExibicao(dataStr) {
+        if (!dataStr) return '';
+        const [datePart, timePart] = dataStr.split('T');
+        return `${datePart} ${timePart}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const resInicioField = document.getElementById('id_res_inicio');
+        const resFimField = document.getElementById('id_res_fim');
+        
+        if (resInicioField && resInicioField.value) {
+            resInicioField.value = formatarDataParaExibicao(resInicioField.value);
+        }
+        if (resFimField && resFimField.value) {
+            resFimField.value = formatarDataParaExibicao(resFimField.value);
+        }
     });
 </script>
 {% endblock %}

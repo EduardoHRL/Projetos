@@ -33,7 +33,7 @@ urlpatterns = [
     path('agenda/criar', views.CriarReserva.as_view(), name='criar_reserva'),
 
     # Urls das reservas
-    path('reservas/reservar/', views.CriarReserva.as_view(), name='reservar'),
+    path('reservas/reservar/<int:lab_codigo>/', views.CriarReserva.as_view(), name='reservar'),
     path('reservas/atualizar/<int:res_codigo>/', views.AtualizarReserva.as_view(), name='atualizar_reserva'),
     path('reservas/excluir/<int:pk>/', views.ExcluirReserva.as_view(), name='excluir_reserva'),
     path('historico/', views.historico_reservas, name='historico'),
@@ -52,5 +52,9 @@ urlpatterns = [
     path('senha-reset/enviado/', auth_views.PasswordResetDoneView.as_view(), name='password_reset_done'),
     path('senha-reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('senha-reset/feito/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+
+    path('api/laboratorios/<int:lab_codigo>/horarios/', views.horarios_laboratorio, name='horarios_laboratorio'),
+    path('verificar-disponibilidade/<int:lab_codigo>/', views.verificar_disponibilidade, name='verificar_disponibilidade'),
+    path('api/laboratorios/<int:lab_codigo>/horarios-disponiveis/', views.horarios_disponiveis, name='horarios_disponiveis'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

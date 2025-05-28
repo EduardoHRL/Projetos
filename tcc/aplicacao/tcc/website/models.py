@@ -1,16 +1,17 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from cpf_field.models import CPFField
+from django.forms import ValidationError
 from multiselectfield import MultiSelectField
 from django.core.validators import FileExtensionValidator, MinLengthValidator
 from simple_history.models import HistoricalRecords, HistoricForeignKey
 
 DIAS_SEMANA = [
-    (0, 'Segunda'),
-    (1, 'Terça'),
-    (2, 'Quarta'),
-    (3, 'Quinta'),
-    (4, 'Sexta'),
+    (0, 'Segunda-feira'),
+    (1, 'Terça-feira'),
+    (2, 'Quarta-feira'),
+    (3, 'Quinta-feira'),
+    (4, 'Sexta-feira'),
     (5, 'Sábado'),
     (6, 'Domingo'),
 ]
@@ -112,7 +113,12 @@ class Reservas(models.Model):
     res_repeticao = models.CharField(max_length=1, choices=REPETICAO_ESCOLHAS, default='N', db_column='res_repeticao')
     res_status = models.CharField(max_length=45, db_column='res_status')
     res_intervalo_semanas = models.PositiveIntegerField(null=True, blank=True, db_column='res_intervalo_semanas')
-    res_dia_semana = models.JSONField(null=True, blank=True, db_column='res_dia_semana')
+    res_dia_semana = models.CharField(
+        max_length=13,
+        null=True,
+        blank=True,
+        help_text="Dias para repetição semanal (0=Segunda, 6=Domingo)"
+    )
     res_data_final_repeticao = models.DateField(null=True, blank=True, db_column='res_data_final_repeticao')
     res_descricao = models.TextField(blank=True, db_column='res_descricao')
     laboratorio = models.ForeignKey(
@@ -127,11 +133,16 @@ class Reservas(models.Model):
     class Meta:
         db_table = 'tbl_reservas'
 
+
 class Disponibilidade(models.Model):
     hor_codigo = models.AutoField(primary_key=True, db_column='hor_codigo')
     hor_inicio = models.TimeField(db_column='hor_inicio')
     hor_fim = models.TimeField(db_column='hor_fim')
-    hor_diasDisponiveis = MultiSelectField(choices=DIAS_SEMANA ,db_column='hor_diasDisponiveis')
+    hor_diasDisponiveis = models.CharField(
+        max_length=13,
+        db_column='hor_diasDisponiveis',
+        help_text="Dias disponíveis separados por vírgula (0=Segunda, 6=Domingo)"
+    )
     laboratorio = models.ForeignKey(
         Laboratorios, on_delete=models.CASCADE, related_name='disponibilidades', db_column='lab_codigo_hor'
     )
@@ -139,8 +150,17 @@ class Disponibilidade(models.Model):
     class Meta:
         db_table = 'tbl_horario_reserva'
 
+    def clean(self):
+        if not all(d.strip() in ('0','1','2','3','4','5','6') for d in self.hor_diasDisponiveis.split(',')):
+            raise ValidationError("Dias devem ser números de 0-6 separados por vírgula")
+        
+    def get_dias_semana_list(self):
+        """Retorna os dias disponíveis como lista"""
+        return self.hor_diasDisponiveis.split(',')
+
     def __str__(self):
-        return f"{self.get_dia_semana_display()} - {self.hor_inicio} às {self.hor_fim}"
+        dias = ", ".join([DIAS_SEMANA[int(d)][1] for d in self.hor_diasDisponiveis.split(",") if d.isdigit()])
+        return f"{dias} - {self.hor_inicio} até {self.hor_fim}"
 
 class Escola(models.Model):
     nome = models.CharField(max_length=100)

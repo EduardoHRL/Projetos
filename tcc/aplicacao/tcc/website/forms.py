@@ -1,7 +1,9 @@
 from django import forms
 from .models import *
-from django.forms import inlineformset_factory
+from django.forms import inlineformset_factory, modelformset_factory
 from django.db.models import Q
+from django.utils import timezone
+from datetime import datetime
 
 class LaboratoriosForm(forms.ModelForm):
     lab_nome = forms.CharField(
@@ -39,23 +41,13 @@ class LaboratoriosForm(forms.ModelForm):
             'lab_status',
             'lab_foto',
         ]
-        
-class DisponibilidadeForm(forms.ModelForm):
-    class Meta:
-        model = Disponibilidade
-        fields = [
-            'hor_diasDisponiveis',
-            'hor_inicio',
-            'hor_fim'
-        ]
 
-DisponibilidadeFormSet = inlineformset_factory(
-    Laboratorios,
+HorarioLaboratorioFormset = modelformset_factory(
     Disponibilidade,
-    fields=['hor_diasDisponiveis', 'hor_inicio', 'hor_fim'],
+    fields=('hor_diasDisponiveis','hor_inicio', 'hor_fim'),
     extra=1,
-    can_delete=True
 )
+
 
 class LaboratorioEquipamentoForm(forms.ModelForm):
     class Meta:
@@ -93,13 +85,36 @@ class ReservasForm(forms.ModelForm):
 
         widgets = {
             "laboratorio": forms.Select(attrs={"class": "w-full border rounded p-2"}),
-            "res_inicio": forms.DateTimeInput(attrs={"type": "datetime-local", "class": "w-full border rounded p-2"}),
-            "res_fim": forms.DateTimeInput(attrs={"type": "datetime-local", "class": "w-full border rounded p-2"}),
+            "res_inicio": forms.DateTimeInput(attrs={"type": "datetime-local", "class": "w-full border rounded p-2"}, format="%Y-%m-%dT%H:%M"
+),
+            "res_fim": forms.DateTimeInput(attrs={"type": "datetime-local", "class": "w-full border rounded p-2"}, format="%Y-%m-%dT%H:%M"
+),
             "res_repeticao": forms.Select(attrs={"class": "w-full border rounded p-2"}),
             "res_intervalo_semanas": forms.NumberInput(attrs={"class": "w-full border rounded p-2"}),
             "res_data_final_repeticao": forms.DateInput(attrs={"type": "date", "class": "w-full border rounded p-2"}),
             "res_descricao": forms.Textarea(attrs={"class": "w-full border rounded p-2", "rows": 3}),
         }
+
+    def clean_res_inicio(self):
+        data = self.cleaned_data.get('res_inicio')
+        if isinstance(data, str):
+            try:
+                # Formato: "YYYY-MM-DD HH:MM"
+                return datetime.strptime(data, '%Y-%m-%d %H:%M')
+            except ValueError:
+                # Formato alternativo para edição: "YYYY-MM-DDTHH:MM"
+                return datetime.strptime(data, '%Y-%m-%dT%H:%M')
+        return data
+
+    def clean_res_fim(self):
+        data = self.cleaned_data.get('res_fim')
+        if isinstance(data, str):
+            try:
+                return datetime.strptime(data, '%Y-%m-%d %H:%M')
+            except ValueError:
+                return datetime.strptime(data, '%Y-%m-%dT%H:%M')
+        return data
+    
     def clean(self):
         cleaned_data = super().clean()
         repeticao = cleaned_data.get('res_repeticao')

@@ -15,7 +15,7 @@ SECRET_KEY = 'django-insecure-%pd)b$*$vsnuf(r-wxl97hn9tz0ee*)amwz%n4j^_*5hfilx*t
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+ 
 LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = '/'
 
@@ -30,20 +30,19 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 # Application definition
 
 INSTALLED_APPS = [
+    'website',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'website',
     'cpf_field',
     'crispy_forms',
     'crispy_tailwind',
     'widget_tweaks',
     'django_filters',
     'simple_history',
-
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"

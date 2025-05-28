@@ -144,6 +144,28 @@
             </div>
 
             <div>
+                <label for="" class="block text-gray-700 mb-2">Horários para reserva</label>
+                <div id="horarios-lista">
+                    <div class="flex items-center space-x-4 mb-2">
+                        <button type="button" class="text-red-500 hover:underline remove-horario invisible">x</button>
+                        <div class="flex flex-wrap gap-2 mb-2">
+                            <label><input type="checkbox" name="dias_semana_0[]" value="0"> Segunda-feira</label>
+                            <label><input type="checkbox" name="dias_semana_0[]" value="1"> Terça-feira</label>
+                            <label><input type="checkbox" name="dias_semana_0[]" value="2"> Quarta-feira</label>
+                            <label><input type="checkbox" name="dias_semana_0[]" value="3"> Quinta-feira</label>
+                            <label><input type="checkbox" name="dias_semana_0[]" value="4"> Sexta-feira</label>
+                            <label><input type="checkbox" name="dias_semana_0[]" value="5"> Sábado</label>
+                            <label><input type="checkbox" name="dias_semana_0[]" value="6"> Domingo</label>
+                        </div>
+                        <input type="time" name="hor_inicio[]" class="flex-1 px-4 py-2 border rounded-lg">
+                        <h5>até</h5>
+                        <input type="time" name="hor_fim[]" class="flex-1 px-4 py-2 border rounded-lg">
+                    </div>
+                </div>
+                <button type="button" onclick="adicionarHorario()" class="mt-2 text-sm text-blue-500 hover:underline">+ Adicionar Horário</button>
+            </div>
+
+            <div>
                 <label class="block text-gray-700">Foto</label>
                 <input type="file" id="id_lab_foto" name="lab_foto" accept="image/*" onchange="loadFile(event)" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
                 <img id="output" class="mt-2 h-24 w-24 object-cover rounded hidden" />
@@ -156,6 +178,37 @@
         </form>
     </div>
 </div>
+
+<script>
+    let horarioIndex = 1;
+
+    function adicionarHorario() {
+        const container = document.getElementById('horarios-lista');
+        const div = document.createElement('div');
+        div.className = 'flex items-center space-x-4 mb-2';
+        div.innerHTML = `
+            <button type="button" class="text-red-500 hover:underline remove-horario">x</button>
+            <div class="flex flex-wrap gap-2 mb-2">
+                <label><input type="checkbox" name="dias_semana_${horarioIndex}[]" value="0"> Segunda-feira</label>
+                <label><input type="checkbox" name="dias_semana_${horarioIndex}[]" value="1"> Terça-feira</label>
+                <label><input type="checkbox" name="dias_semana_${horarioIndex}[]" value="2"> Quarta-feira</label>
+                <label><input type="checkbox" name="dias_semana_${horarioIndex}[]" value="3"> Quinta-feira</label>
+                <label><input type="checkbox" name="dias_semana_${horarioIndex}[]" value="4"> Sexta-feira</label>
+                <label><input type="checkbox" name="dias_semana_${horarioIndex}[]" value="5"> Sábado</label>
+                <label><input type="checkbox" name="dias_semana_${horarioIndex}[]" value="6"> Domingo</label>
+            </div>
+            <input type="time" name="hor_inicio[]" class="flex-1 px-4 py-2 border rounded-lg">
+            <h5>até</h5>
+            <input type="time" name="hor_fim[]" class="flex-1 px-4 py-2 border rounded-lg">
+        `;
+        container.appendChild(div);
+        horarioIndex++;
+    }
+
+    $('#horarios-lista').on('click', '.remove-horario', function () {
+        $(this).parent().remove();
+    });
+</script>
 
 <script>
     function expandImage(src) {
@@ -280,6 +333,7 @@
             $('#modalTitle').text('Editar Laboratório');
             $('#editForm')[0].reset();
             $('#equipamentos-lista').empty();
+            $('#horarios-lista').empty(); // Limpa os horários existentes
             $('#id_lab_codigo').val(currentCodigo);
             $('.text-red-500').addClass('hidden');
             
@@ -296,42 +350,67 @@
                 $('#output').attr('src', imgSrc).removeClass('hidden');
             }
 
-            // Preenche equipamentos
-            const equipamentosHTML = row.find('td:eq(5)').html();
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = equipamentosHTML;
+            // Preenche equipamentos (seu código existente aqui...)
+            // ... (mantenha o código existente de equipamentos)
 
-            $(tempDiv).find('li').each(function () {
-                const texto = $(this).text().trim();
-                if (texto.toLowerCase().includes('nenhum equipamento')) return;
+            // Carrega os horários via AJAX
+            $.ajax({
+                url: `/api/laboratorios/${currentCodigo}/horarios/`,
+                type: 'GET',
+                success: function(response) {
+                    if (response.horarios && response.horarios.length > 0) {
+                        // Agrupa horários por intervalo de tempo (inicio/fim)
+                        const horariosAgrupados = {};
+                        
+                        response.horarios.forEach(horario => {
+                            const chave = `${horario.inicio}-${horario.fim}`;
+                            if (!horariosAgrupados[chave]) {
+                                horariosAgrupados[chave] = {
+                                    inicio: horario.inicio,
+                                    fim: horario.fim,
+                                    dias: []
+                                };
+                            }
+                            horariosAgrupados[chave].dias.push(horario.dias);
+                        });
 
-                const partes = texto.match(/^(.*?)\s+\((\d+)\)$/);
-                if (!partes) return;
-
-                const nome = partes[1].trim();
-                const quantidade = partes[2].trim();
-
-                const equipamentoInput = `
-                    <div class="flex items-center space-x-4 mb-2">
-                        <button type="button" class="text-red-500 hover:underline remove-equipamento">x</button>
-                        <input type="text" name="equipamentos[]" value="${nome}" class="flex-1 px-4 py-2 border rounded-lg" />
-                        <input type="number" name="quantidades[]" value="${quantidade}" class="w-20 px-2 py-2 border rounded-lg" />
-                    </div>
-                `;
-                $('#equipamentos-lista').append(equipamentoInput);
+                        // Para cada grupo de horário, cria um bloco no formulário
+                        Object.values(horariosAgrupados).forEach((grupo, index) => {
+                            const container = document.getElementById('horarios-lista');
+                            const div = document.createElement('div');
+                            div.className = 'flex items-center space-x-4 mb-2';
+                            
+                            let diasHtml = '';
+                            for (let i = 0; i < 7; i++) {
+                                const checked = grupo.dias.includes(i.toString()) ? 'checked' : '';
+                                const dias = ['Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado', 'Domingo'];
+                                diasHtml += `<label><input type="checkbox" name="dias_semana_${index}[]" value="${i}" ${checked}> ${dias[i]}</label>`;
+                            }
+                            
+                            div.innerHTML = `
+                                <button type="button" class="text-red-500 hover:underline remove-horario">x</button>
+                                <div class="flex flex-wrap gap-2 mb-2">
+                                    ${diasHtml}
+                                </div>
+                                <input type="time" name="hor_inicio[]" value="${grupo.inicio}" class="flex-1 px-4 py-2 border rounded-lg">
+                                <h5>até</h5>
+                                <input type="time" name="hor_fim[]" value="${grupo.fim}" class="flex-1 px-4 py-2 border rounded-lg">
+                            `;
+                            container.appendChild(div);
+                        });
+                        
+                        // Atualiza o índice para os próximos horários que possam ser adicionados
+                        horarioIndex = Object.keys(horariosAgrupados).length;
+                    } else {
+                        // Se não houver horários, adiciona um campo vazio
+                        adicionarHorario();
+                    }
+                },
+                error: function() {
+                    // Em caso de erro, adiciona um campo vazio
+                    adicionarHorario();
+                }
             });
-
-            if ($('#equipamentos-lista').children().length === 0) {
-                $('#equipamentos-lista').html(`
-                    <div class="flex items-center space-x-4 mb-2">
-                        <button type="button" class="text-red-500 hover:underline remove-equipamento invisible">x</button>
-                        <input type="text" name="equipamentos[]" placeholder="Nome do equipamento" class="flex-1 px-4 py-2 border rounded-lg" />
-                        <input type="number" name="quantidades[]" placeholder="Qtd." min="1" class="w-20 px-2 py-2 border rounded-lg" />
-                    </div>
-                `);
-            } else if ($('#equipamentos-lista').children().length > 1) {
-                $('#equipamentos-lista .remove-equipamento').removeClass('invisible');
-            }
 
             openModal();
         });

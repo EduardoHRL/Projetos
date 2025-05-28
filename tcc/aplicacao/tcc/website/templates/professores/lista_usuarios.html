@@ -2,6 +2,29 @@
 {% block title %}Usuários{% endblock %}
 {% load static %}
 {% block content %}
+
+{% if messages %}
+    <div class="w-full flex justify-center">
+        {% for message in messages %}
+            <div class="alert flex items-center justify-between px-4 py-3 text-white rounded-lg shadow-md
+                {% if message.tags == 'error' %}
+                    bg-red-600
+                {% elif message.tags == 'success' %}
+                    bg-green-600
+                {% elif message.tags == 'warning' %}
+                    bg-yellow-600
+                {% else %}
+                    bg-blue-600
+                {% endif %}">
+                <span>{{ message }}</span>
+                <button type="button" class="ml-4 text-white hover:text-gray-200" onclick="this.parentElement.remove()">
+                    &times;
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
 <div class="flex justify-between items-center mb-6">
     <h5 class="text-xl font-bold">Lista de Usuários</h5>
     <button id="btnSolicitacao" onclick="openModalSolicitacoes()"
@@ -151,6 +174,14 @@
     }
 </style>
 
+<script>
+    setTimeout(() => {
+        document.querySelectorAll('.alert').forEach(alert => {
+            alert.classList.remove('show');
+            setTimeout(() => alert.remove(), 300);
+        });
+    }, 5000);
+</script>
 
 <script>
     var modalSolicitacoes = $('#solicitacoesModal');
